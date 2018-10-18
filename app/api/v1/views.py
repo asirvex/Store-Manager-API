@@ -57,4 +57,7 @@ class Sales(Resource):
             return make_response(
                 jsonify({"message":"no sales available"}), 404
             )
-    
+        return make_response(
+            jsonify(data), 200
+        )
+        
