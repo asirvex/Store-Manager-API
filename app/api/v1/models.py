@@ -31,8 +31,18 @@ class StoreAttendant():
     def get_admin_status(self):
         return self.admin
 
+    def create_sale(self, sale_id, date, owner, products_sold, total_price):
+        sale_id = Sale(sale_id, date, owner, products_sold, total_price)
+        sales.append(sale_id)
 
-    
+    def view_sales(self):
+        my_sales=[]
+        for sale in sales:
+            if sale.get_owner() == self.username:
+                my_sales.append(sale.get_dict())
+        
+        return my_sales
+                
 
 class Admin(StoreAttendant):
     """creates an admin object"""
@@ -91,10 +101,40 @@ class Product():
             }
 
 class Sale():
-    def __init__(self, sale_owner, employee_name, sold_products):
-        self.sale_id = len(sales) + 1
-        self.owner = employee_name
-        self.products = sold_products
+    def __init__(self, sale_id, date, owner, products_sold, total_price):
+        self.sale_id = sale_id
+        self.date = date
+        self.owner = owner
+        self.products_sold = products_sold
+        self.total_price = total_price
+
+    def get_id(self):
+        return self.sale_id
+
+    def get_date(self):
+        return self.date()
+
+    def get_owner(self):
+        return self.owner
+
+    def get_products_sold(self):
+        return self.products_sold  
+    
+    def get_total_price(self):
+        return self.total_price 
+
+    def get_dict(self):
+        attributes_dict = {
+            "sale_id" : self.sale_id,
+            "date" : self.date,
+            "owner" : self.owner,
+            "products sold" : self.products_sold,
+            "total price": self.total_price
+        }
+        return attributes_dict
+
+
 
 admin = Admin(1, "main_admin", "main", "admin", "pwd")
+attendant = StoreAttendant(12, "example", "brayo", "atenda", "pwd")
 

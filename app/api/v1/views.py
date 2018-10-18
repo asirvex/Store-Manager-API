@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import jsonify, request, make_response
-from .models import store_attendants, products, Product, Admin, StoreAttendant, admin
+from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
 from .utils import validate_product_input, exists
 
 class Products(Resource):
@@ -34,10 +34,14 @@ class Products(Resource):
         
 class SpecificProduct(Resource):
     def get(self, product_id):
+        if not products:
+            return make_response(
+                jsonify({"message": "no product found"}),404
+                )
         product_id = int(product_id)
         data = {}
         for product in products:
-            if product.get_id() == product:
+            if int(product.get_id()) == product:
                 data["name"] = product.get_name()
                 data["id"] = product.get_id()
                 data["quantity"] = product.get_quantity()
@@ -45,6 +49,12 @@ class SpecificProduct(Resource):
                 return make_response(
                     jsonify({data}), 200
                 )
- 
-        
 
+class Sales(Resource):
+    def get(self):
+        data = attendant.view_sales()
+        if not data:
+            return make_response(
+                jsonify({"message":"no sales available"}), 404
+            )
+    
