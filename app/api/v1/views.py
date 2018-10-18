@@ -37,13 +37,13 @@ class SpecificProduct(Resource):
         product_id = int(product_id)
         data = {}
         for product in products:
-            if product.get_id() == product:
+            if product.get_id() == product_id:
                 data["name"] = product.get_name()
                 data["id"] = product.get_id()
                 data["quantity"] = product.get_quantity()
                 data["price"] = product.get_price()
                 return make_response(
-                    jsonify({data}), 200
+                    jsonify(data), 200
                 )
  
         
