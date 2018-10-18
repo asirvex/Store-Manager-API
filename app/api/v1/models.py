@@ -64,6 +64,7 @@ class Product():
         self.id = len(products) + 1
         self.name = name
         self.description = description
+        self.quantity = quantity
         self.price = price
 
     def get_id(self):
@@ -71,13 +72,15 @@ class Product():
 
     def get_name(self):
         return self.name
+
+    def get_quantity(self):
+        return self.quantity
     
     def get_description(self):
         return self.description
 
     def get_price(self):
         return self.price
-    
     
     def get_all_attributes(self):
         return {
@@ -86,6 +89,12 @@ class Product():
             "description": self.description,
             "price": self.price
             }
+
+class Sale():
+    def __init__(self, sale_owner, employee_name, sold_products):
+        self.sale_id = len(sales) + 1
+        self.owner = employee_name
+        self.products = sold_products
 
 admin = Admin(1, "main_admin", "main", "admin", "pwd")
 
