@@ -1,38 +1,37 @@
 from flask_restful import Resource
 from flask import jsonify, request, make_response
-from .models import store_attendants, products, sales
+from .models import store_attendants, products, Admin, StoreAttendant, admin
+from .utils import validate_product_input, exists
 
 class Products(Resource):
     def get(self):
+        data=[]
         if not products:
             return make_response(
-                jsonify({"message": "no product found"}),
-                404)
-
+                jsonify({"message": "no product found"}),404
+                )
+        for product in products:
+            data.append(product.get_all_attributes())
         return make_response(
-            jsonify(products),  
-            200)
+            jsonify({"products": data}), 200
+        )
 
     def post(self):
         data = request.get_json()
-        if "name" not in data or "description" not in data or "price" not in data:
-            return jsonify({"message":"please input the data in the correct format"})
-        if not data["name"] or not data["description"] or not data["price"]:
+        if not validate_product_input(data)[0]:
             return make_response(
-                jsonify({"message":"please make sure id, name and price fields are not empty data"}),
-               400)
-        for product in products:
-            if data["name"] == product["name"]:
-                return make_response(
-                jsonify({"message": "product already in products"}),
-                400)                 
-        id=len(products)+1
-        data["id"]=id
-        products.append(data)
+                jsonify({"message": validate_product_input(data)[1]}), 400
+                )
+        if exists(data["name"], products):
+            return make_response(
+                jsonify({"message": "product name already exists"}), 400
+            )
+        admin.add_product(data["name"], data["description"], data["quantity"], data["price"])
         return make_response(
-            jsonify({"message": "posted successfully"}),
-            201)
+            jsonify({"message": "Product added successfully"}), 201
+            )
 
+        
 #class OneProduct(Resource):
 #    def get(self, product_id):
 

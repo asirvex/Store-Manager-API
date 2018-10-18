@@ -30,6 +30,8 @@ class StoreAttendant():
 
     def get_admin_status(self):
         return self.admin
+
+
     
 
 class Admin(StoreAttendant):
@@ -39,7 +41,7 @@ class Admin(StoreAttendant):
         self.admin = True
 
     def add_store_attendant(self, employee_id, username, first_name, second_name, password):
-    """Creates a store_attedant object and adds it to the store attendants list"""
+        """Creates a store_attedant object and adds it to the store attendants list"""
         if username in store_attendants:
             return "username already taken"
         for employee in store_attendants:
@@ -48,11 +50,42 @@ class Admin(StoreAttendant):
         username = StoreAttendant(employee_id, username, first_name, second_name, password)
         store_attendants.append(username)
         return "store attendant created successfully"
+    
+    def add_product(self, name, description, Quantity, price):
+        """creates a product object and appends it to the products dictionary"""
+        name = Product(name, description, Quantity, price)
+        products.append(name)
 
-class Products():
-    def __init__(self, id, name, description, price):
-        self.id = id
+
+        
+class Product():
+    """creates a product object"""
+    def __init__(self, name, description, quantity, price):
+        self.id = len(products) + 1
         self.name = name
         self.description = description
         self.price = price
+
+    def get_id(self):
+        return self.id
+
+    def get_name(self):
+        return self.name
     
+    def get_description(self):
+        return self.description
+
+    def get_price(self):
+        return self.price
+    
+    
+    def get_all_attributes(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "price": self.price
+            }
+
+admin = Admin(1, "main_admin", "main", "admin", "pwd")
+
