@@ -1,8 +1,31 @@
 from datetime import date
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+import datetime
 from flask_restful import Resource
 from flask import jsonify, request, make_response
 from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
 from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity
+from instance.config import Config
+
+def token_auth(func):
+    @wraps(func)
+    def decorated(*args, **kwags):
+        token= None
+        if "access_token" in request.headers:
+            token=request.headers["access_token"]
+        if not token:
+            return jsonify({"message":"token required"}), 401
+        token_data=jwt.decode(token, Config.secret_key)
+        try:
+            for user in store_attendants:
+                if user.get_username() == token_data["username"]:
+                    current_user = user.get_username()
+        except Exception:
+            return jsonify({"message":"invalid token"}), 401
+        return func(current_user, *args, **kwags)
+    return decorated
 
 class Products(Resource):
     def get(self):
@@ -89,4 +112,18 @@ class Sales(Resource):
         
 class Login(Resource):
     def post(self):
-        pass
+        username=request.get_json()["username"]
+        password=request.get_json()["password"]
+        token = None
+        exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+        for user in store_attendants:
+            if username==user.get_username and check_password_hash(user.get_password(), password):
+                token = jwt.encode({"username": user.get_username(), "exp":exp}, Config.secret_key)
+                resp= make_response(
+                    jsonify({"token": token.decode("UTF-8")}), 202
+                )
+        if not token:
+            resp=make_response(
+                jsonify({"message": "could not log you in"}), 401
+            )
+        return resp
