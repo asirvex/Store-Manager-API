@@ -5,8 +5,10 @@ import jwt
 import datetime
 from flask_restful import Resource
 from flask import jsonify, request, make_response
-from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
-from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity
+from .models import store_attendants, products, Product, Admin, StoreAttendant
+from .models import admin, sales, Sale, attendant
+from .utils import validate_product_input, exists, validate_sales_input
+from .utils import product_exists, right_quantity, subtract_quantity, total_price
 from .utils import verify_sign_up, generate_userid, password_validate, verify_login
 from instance.config import Config
 
@@ -24,7 +26,7 @@ def token_auth(func):
         try:
             for user in store_attendants:
                 if user.get_username() == token_data["username"]:
-                    current_user = user.get_username()
+                    current_user = user
         except Exception:
             return make_response(
                 jsonify({"message":"invalid token"}), 401
@@ -34,7 +36,7 @@ def token_auth(func):
 
 class Products(Resource):
     @token_auth
-    def get(self):
+    def get(current_user, self):
         data=[]
         if not products:
             return make_response(
@@ -47,7 +49,7 @@ class Products(Resource):
         )
 
     @token_auth  
-    def post(self, current_user):
+    def post(current_user, self):
         if not current_user.get_admin_status():
             return make_response(
                 jsonify({"message": "only the admin can add a product"}), 401
@@ -69,7 +71,7 @@ class Products(Resource):
         
 class SpecificProduct(Resource):
     @token_auth
-    def get(self, product_id):
+    def get(current_user, self):
         if not products:
             return make_response(
                 jsonify({"message": "no product found"}),404
@@ -86,9 +88,10 @@ class SpecificProduct(Resource):
                     jsonify({data}), 200
                 )
 
+
 class Sales(Resource):
     @token_auth
-    def get(self, current_user):
+    def get(current_user, self):
         data = current_user.view_sales()
         if not data:
             return make_response(
@@ -99,7 +102,7 @@ class Sales(Resource):
         )
 
     @token_auth
-    def post(self, current_user):
+    def post(current_user, self):
         data = request.get_json()
         ddata = {}
         if not validate_sales_input(data)[0]:
@@ -123,7 +126,8 @@ class Sales(Resource):
         return make_response(
             jsonify({"message": "sale added successfully"}), 201
         )
-        
+
+
 class Login(Resource):
     def post(self):
         data = request.get_json()
@@ -136,10 +140,10 @@ class Login(Resource):
         token = None
         exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
         for user in store_attendants:
-            if username==user.get_username and check_password_hash(user.get_password(), password):
+            if username==user.get_username() and check_password_hash(user.get_password(), password):
                 token = jwt.encode({"username": user.get_username(), "exp":exp}, Config.secret_key)
                 resp= make_response(
-                    jsonify({"token": token.decode("UTF-8")}), 202
+                    jsonify({"token": token.decode("UTF-8")}), 200
                 )
         if not token:
             resp=make_response(
@@ -147,9 +151,10 @@ class Login(Resource):
             )
         return resp
 
+
 class SignUp(Resource):
     def post(self):
-        data = request.get_json("username")
+        data = request.get_json()
         if not verify_sign_up(data)[0]:
             return make_response(
                 jsonify({"message": verify_sign_up(data)[1]}), 400
@@ -157,6 +162,11 @@ class SignUp(Resource):
         first_name = data["first_name"]
         second_name = data["second_name"]
         username = data["username"]
+        for user in store_attendants:
+            if user.get_username()==username:
+                return make_response(
+                    jsonify({"message": "username already taken"}), 400
+                )
         password = generate_password_hash(data["password"])
         if not password_validate(password)[0]:
             return make_response(
@@ -165,5 +175,7 @@ class SignUp(Resource):
         user_id = generate_userid(store_attendants)
         admin.add_store_attendant(user_id, username, first_name, second_name, password)
         return make_response(
-            jsonify({"message": "user added succesfully"}), 201
+            jsonify({"message": "user added succesfully", "SDF": password}), 201
         )
+        print(store_attendants)
+        print("KSJFGKLJLJKL")
