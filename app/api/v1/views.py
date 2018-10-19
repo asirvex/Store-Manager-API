@@ -5,9 +5,10 @@ from werkzeug.security import check_password_hash
 import jwt
 from flask_restful import Resource
 from flask import jsonify, request, make_response
-from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
+from models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
 from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity, token_auth
 
+products=products
 class Products(Resource):
     def get(self):
         data=[]

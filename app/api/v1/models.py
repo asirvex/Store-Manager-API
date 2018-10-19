@@ -1,4 +1,4 @@
-from .utils import generate_userid
+from utils import generate_userid
 from werkzeug.security import generate_password_hash
 store_attendants = []
 products = []

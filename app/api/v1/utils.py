@@ -5,7 +5,7 @@ import datetime
 import os
 from functools import wraps
 
-from .models import products, Product, StoreAttendant, store_attendants
+from views import products, Product, StoreAttendant, store_attendants
 
 def password_validate():
     pass
