@@ -66,8 +66,7 @@ class Admin(StoreAttendant):
         name = Product(name, description, Quantity, price)
         products.append(name)
 
-
-        
+ 
 class Product():
     """creates a product object"""
     def __init__(self, name, description, quantity, price):

@@ -1,7 +1,8 @@
+from datetime import date
 from flask_restful import Resource
 from flask import jsonify, request, make_response
 from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
-from .utils import validate_product_input, exists
+from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity
 
 class Products(Resource):
     def get(self):
@@ -59,5 +60,30 @@ class Sales(Resource):
             )
         return make_response(
             jsonify(data), 200
+        )
+
+    def post(self):
+        data = request.get_json()
+        ddata = {}
+        if not validate_sales_input(data)[0]:
+            return make_response(
+                jsonify({"message": validate_sales_input(data)[1]}), 400
+                )
+        if not product_exists(data)[0]:
+            return make_response(
+                jsonify({"message": product_exists(data)[1]}), 400
+            )
+        if not right_quantity(data)[0]:
+            return make_response(
+                jsonify({"message": right_quantity(data)[1]}), 400
+            )
+        ddata["products_sold"] = data
+        ddata["date"] = str(date.today())
+        ddata["total_price"] = total_price(data)
+        ddata["sale_id"] = len(sales)+1
+        subtract_quantity(data)
+        attendant.create_sale(ddata["sale_id"], ddata["date"], attendant.get_username(), ddata["products_sold"], ddata["total_price"] )
+        return make_response(
+            jsonify({"message": "sale added successfully"}), 201
         )
         
