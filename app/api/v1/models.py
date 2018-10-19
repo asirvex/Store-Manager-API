@@ -1,3 +1,5 @@
+from .utils import generate_userid
+from werkzeug.security import generate_password_hash
 store_attendants = []
 products = []
 sales = []
@@ -50,14 +52,16 @@ class Admin(StoreAttendant):
         super().__init__(employee_id, username, first_name, second_name, password)
         self.admin = True
 
-    def add_store_attendant(self, employee_id, username, first_name, second_name, password):
+    def add_store_attendant(self, username, first_name, second_name, password):
         """Creates a store_attedant object and adds it to the store attendants list"""
         if username in store_attendants:
             return "username already taken"
+        employee_id = generate_userid(store_attendants)
+        hashed_password = generate_password_hash(password)
         for employee in store_attendants:
             if employee.get_employee_id() == employee_id:
                 return "employee id already taken"
-        username = StoreAttendant(employee_id, username, first_name, second_name, password)
+        username = StoreAttendant(employee_id, username, first_name, second_name, hashed_password)
         store_attendants.append(username)
         return "store attendant created successfully"
     
@@ -135,5 +139,5 @@ class Sale():
 
 
 admin = Admin(1, "main_admin", "main", "admin", "pwd")
-attendant = StoreAttendant(12, "example", "brayo", "atenda", "pwd")
+attendant = StoreAttendant(12, "example", "brayo", "atenda", generate_password_hash("pwd"))
 

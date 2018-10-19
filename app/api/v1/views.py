@@ -1,8 +1,12 @@
 from datetime import date
+import datetime
+import os
+from werkzeug.security import check_password_hash
+import jwt
 from flask_restful import Resource
 from flask import jsonify, request, make_response
 from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
-from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity
+from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity, token_auth
 
 class Products(Resource):
     def get(self):
@@ -87,3 +91,20 @@ class Sales(Resource):
             jsonify({"message": "sale added successfully"}), 201
         )
         
+class Login(Resource):
+    def post(self):
+        if not store_attendants:
+            return make_response(
+                jsonify({"message": "no user has been created"}), 
+            )
+        username=request.get_json()["username"]
+        password=request.get_json()["password"]
+        token = None
+        exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+        for user in store_attendants:
+            if username==user.get_username() and check_password_hash(user.get_password(), password):
+                token = jwt.encode({"username": user.get_username(), "exp":exp}, os.getenv("SECRET"))
+                resp=jsonify({"token": token.decode("UTF-8")})
+        if not token:
+            resp=jsonify({"message": "could not log you in"}), 401
+        return resp

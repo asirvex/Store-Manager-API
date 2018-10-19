@@ -1,4 +1,11 @@
-from .models import products, Product
+import random
+from flask import request
+import jwt
+import datetime
+import os
+from functools import wraps
+
+from .models import products, Product, StoreAttendant, store_attendants
 
 def password_validate():
     pass
@@ -93,6 +100,32 @@ def subtract_quantity(products_list):
             if item["name"] == product.get_name():
                 product.quantity = product.get_quantity() - item["quantity"]
     
+     
+def generate_userid(store_attendants):
+    user_id=random.randint(1, 1000)
+    if store_attendants:
+        for a_user in store_attendants:
+            if a_user.get_employee_id()==user_id:
+                return generate_userid(store_attendants)
+    return user_id
 
-
-        
+def token_auth(func):
+    @wraps(func)
+    def decorated(*args, **kwags):
+        token= None
+        users_info=store_attendants
+        if "access_token" in request.headers:
+            token=request.headers["access_token"]
+        if not token:
+            message = "invalid token"
+            return message
+        token_data=jwt.decode(token, os.getenv("SECRET"))
+        try:
+            for a_user in users_info:
+                if a_user.get_username() == token_data["username"]:
+                    current_user = a_user
+        except Exception:
+            message = "invalid token"
+            return message
+        return func(current_user, *args, **kwags)
+    return decorated
