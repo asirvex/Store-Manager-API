@@ -7,8 +7,10 @@ from functools import wraps
 
 from .models import products, Product, StoreAttendant, store_attendants
 
-def password_validate():
-    pass
+def password_validate(password):
+    if len(password) < 6:
+        return False, "Password should have more than 6 characters"
+    return True, "success"
     
 def not_empty(*args, **kwargs):
     """checks if the given arguements are not empty"""
@@ -108,3 +110,14 @@ def generate_userid(store_attendants):
             if a_user.get_employee_id()==user_id:
                 return generate_userid(store_attendants)
     return user_id
+
+def verify_sign_up(data):
+    if "username" not in data or "first_name" not in data or "second_name" not in data or "password" not in data:
+        message = "Data input should contain 'username', 'first_name', 'second_name' and 'password' fields"
+        return False, message
+    for value in data.values():
+        if not value:
+            message = "Atleast one field contains an empty input"
+            return False, message
+    return True, "success"
+

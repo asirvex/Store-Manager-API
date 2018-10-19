@@ -7,6 +7,7 @@ from flask_restful import Resource
 from flask import jsonify, request, make_response
 from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
 from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity
+from .utils import verify_sign_up, generate_userid, password_validate
 from instance.config import Config
 
 def token_auth(func):
@@ -112,8 +113,13 @@ class Sales(Resource):
         
 class Login(Resource):
     def post(self):
-        username=request.get_json()["username"]
-        password=request.get_json()["password"]
+        data = request.get_json()
+        if not data:
+            make_response(
+                jsonify({"message": "input should contain username and password"})
+            )
+        username=data["username"]
+        password=data["password"]
         token = None
         exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
         for user in store_attendants:
@@ -131,7 +137,20 @@ class Login(Resource):
 class SignUp(Resource):
     def post(self):
         data = request.get_json("username")
+        if not verify_sign_up(data)[0]:
+            return make_response(
+                jsonify({"message": verify_sign_up(data)[1])
+            )
         first_name = data["first_name"]
         second_name = data["second_name"]
         username = data["username"]
-        password = data["password"]
+        password = generate_password_hash(data["password"])
+        if not password_validate(password)[0]:
+            return make_response(
+                jsonify({"message": password_validate(password)[1]})
+            )
+        user_id = generate_userid(store_attendants)
+        admin.add_store_attendant(user_id, username, first_name, second_name, password)
+        return make_response(
+            jsonify({"message": "user added succesfully"})
+        )
