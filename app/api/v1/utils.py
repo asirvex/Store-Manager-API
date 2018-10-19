@@ -34,7 +34,10 @@ def validate_product_input(dictionary):
         if not value:
             message = "Atleast one field contains an empty input"
             return False, message
-    dictionary["price"] = float(dictionary["price"])
+    try:
+        dictionary["price"] = float(dictionary["price"])
+    except:
+        pass
     if type(dictionary["name"]) is not str or type(dictionary["description"]) is not str or type(dictionary["quantity"]) is not int or type(dictionary["price"]) is not float:
         message = "incorrect data types, data types should be: 'name' - string, 'description' - str, quantity - int, 'price' - float"
         return False, message
@@ -121,3 +124,12 @@ def verify_sign_up(data):
             return False, message
     return True, "success"
 
+def verify_login(data):
+    if "username" not in data or "password" not in data:
+        message = "Data input should contain 'username' and 'password' fields"
+        return False, message
+    for value in data.values():
+        if not value:
+            message = "Atleast one field contains an empty input"
+            return False, message
+    return True, "success"

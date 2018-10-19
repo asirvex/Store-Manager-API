@@ -7,7 +7,7 @@ from flask_restful import Resource
 from flask import jsonify, request, make_response
 from .models import store_attendants, products, Product, Admin, StoreAttendant, admin, sales, Sale, attendant
 from .utils import validate_product_input, exists, validate_sales_input, total_price, product_exists, right_quantity, subtract_quantity
-from .utils import verify_sign_up, generate_userid, password_validate
+from .utils import verify_sign_up, generate_userid, password_validate, verify_login
 from instance.config import Config
 
 def token_auth(func):
@@ -17,18 +17,23 @@ def token_auth(func):
         if "access_token" in request.headers:
             token=request.headers["access_token"]
         if not token:
-            return jsonify({"message":"token required"}), 401
+            return make_response(
+                jsonify({"message":"token required"}), 401
+            )
         token_data=jwt.decode(token, Config.secret_key)
         try:
             for user in store_attendants:
                 if user.get_username() == token_data["username"]:
                     current_user = user.get_username()
         except Exception:
-            return jsonify({"message":"invalid token"}), 401
+            return make_response(
+                jsonify({"message":"invalid token"}), 401
+            )
         return func(current_user, *args, **kwags)
     return decorated
 
 class Products(Resource):
+    @token_auth
     def get(self):
         data=[]
         if not products:
@@ -41,7 +46,12 @@ class Products(Resource):
             jsonify({"products": data}), 200
         )
 
-    def post(self):
+    @token_auth  
+    def post(self, current_user):
+        if not current_user.get_admin_status():
+            return make_response(
+                jsonify({"message": "only the admin can add a product"}), 401
+            )
         data = request.get_json()
         if not validate_product_input(data)[0]:
             return make_response(
@@ -58,6 +68,7 @@ class Products(Resource):
 
         
 class SpecificProduct(Resource):
+    @token_auth
     def get(self, product_id):
         if not products:
             return make_response(
@@ -76,8 +87,9 @@ class SpecificProduct(Resource):
                 )
 
 class Sales(Resource):
-    def get(self):
-        data = attendant.view_sales()
+    @token_auth
+    def get(self, current_user):
+        data = current_user.view_sales()
         if not data:
             return make_response(
                 jsonify({"message":"no sales available"}), 404
@@ -86,7 +98,8 @@ class Sales(Resource):
             jsonify(data), 200
         )
 
-    def post(self):
+    @token_auth
+    def post(self, current_user):
         data = request.get_json()
         ddata = {}
         if not validate_sales_input(data)[0]:
@@ -106,7 +119,7 @@ class Sales(Resource):
         ddata["total_price"] = total_price(data)
         ddata["sale_id"] = len(sales)+1
         subtract_quantity(data)
-        attendant.create_sale(ddata["sale_id"], ddata["date"], attendant.get_username(), ddata["products_sold"], ddata["total_price"] )
+        current_user.create_sale(ddata["sale_id"], ddata["date"], current_user.get_username(), ddata["products_sold"], ddata["total_price"] )
         return make_response(
             jsonify({"message": "sale added successfully"}), 201
         )
@@ -114,9 +127,9 @@ class Sales(Resource):
 class Login(Resource):
     def post(self):
         data = request.get_json()
-        if not data:
-            make_response(
-                jsonify({"message": "input should contain username and password"})
+        if not verify_login(data)[0]:
+            return make_response(
+                jsonify({"message": verify_login(data)[1]}), 400
             )
         username=data["username"]
         password=data["password"]
