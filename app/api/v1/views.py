@@ -127,3 +127,11 @@ class Login(Resource):
                 jsonify({"message": "could not log you in"}), 401
             )
         return resp
+
+class SignUp(Resource):
+    def post(self):
+        data = request.get_json("username")
+        first_name = data["first_name"]
+        second_name = data["second_name"]
+        username = data["username"]
+        password = data["password"]
