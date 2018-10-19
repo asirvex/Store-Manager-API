@@ -136,4 +136,3 @@ class Sale():
 
 admin = Admin(1, "main_admin", "main", "admin", "pwd")
 attendant = StoreAttendant(12, "example", "brayo", "atenda", "pwd")
-

@@ -87,3 +87,6 @@ class Sales(Resource):
             jsonify({"message": "sale added successfully"}), 201
         )
         
+class Login(Resource):
+    def post(self):
+        pass
