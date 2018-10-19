@@ -139,7 +139,7 @@ class SignUp(Resource):
         data = request.get_json("username")
         if not verify_sign_up(data)[0]:
             return make_response(
-                jsonify({"message": verify_sign_up(data)[1]})
+                jsonify({"message": verify_sign_up(data)[1]}), 400
             )
         first_name = data["first_name"]
         second_name = data["second_name"]
@@ -147,10 +147,10 @@ class SignUp(Resource):
         password = generate_password_hash(data["password"])
         if not password_validate(password)[0]:
             return make_response(
-                jsonify({"message": password_validate(password)[1]})
+                jsonify({"message": password_validate(password)[1]}), 400
             )
         user_id = generate_userid(store_attendants)
         admin.add_store_attendant(user_id, username, first_name, second_name, password)
         return make_response(
-            jsonify({"message": "user added succesfully"})
+            jsonify({"message": "user added succesfully"}), 201
         )
