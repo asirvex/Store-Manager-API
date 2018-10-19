@@ -139,7 +139,7 @@ class SignUp(Resource):
         data = request.get_json("username")
         if not verify_sign_up(data)[0]:
             return make_response(
-                jsonify({"message": verify_sign_up(data)[1])
+                jsonify({"message": verify_sign_up(data)[1]})
             )
         first_name = data["first_name"]
         second_name = data["second_name"]
