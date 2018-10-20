@@ -1,3 +1,4 @@
+from werkzeug.security import generate_password_hash
 store_attendants = []
 products = []
 sales = []
@@ -65,6 +66,8 @@ class Admin(StoreAttendant):
         """creates a product object and appends it to the products dictionary"""
         name = Product(name, description, Quantity, price)
         products.append(name)
+    
+
 
  
 class Product():
@@ -133,6 +136,10 @@ class Sale():
         return attributes_dict
 
 
+def clear_lists():
+    products.clear()
+    sales.clear
 
-admin = Admin(1, "main_admin", "main", "admin", "pwd")
-attendant = StoreAttendant(12, "example", "brayo", "atenda", "pwd")
+admin = Admin(1, "main_admin", "main", "admin", generate_password_hash("pwd"))
+attendant = StoreAttendant(12, "example", "brayo", "atenda", generate_password_hash("pwd"))
+store_attendants.append(admin)

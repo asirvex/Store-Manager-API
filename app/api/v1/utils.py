@@ -47,14 +47,14 @@ def validate_product_input(dictionary):
 
 def validate_sales_input(products_list):
     if type(products_list) is not list:
-        message = "The sales input should a list of dictionaries which containt 'name' 'quantity' and 'price' keys"
+        message = "The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys"
         return False, message
     if not products_list:
-        message = "Empty input, The sales input should a list of dictionaries which containt 'name' 'quantity' and 'price' keys"
+        message = "Empty input, The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys"
         return False, message
     for product in products_list:
         if "name" not in product or "quantity" not in product or "price" not in product:
-            message = "The sales input should a list of dictionaries which containt 'name' 'quantity' and 'price' keys"
+            message = "The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys"
             return False, message
         for value in product.values():
             if not value:
@@ -69,7 +69,6 @@ def validate_sales_input(products_list):
 
 def product_exists(products_list):
     print(type(products_list))
-    print("askljd=fjsdjlkhjkashdflkhasdjkl=hfjklshj")
     i=0
     for item in products_list:
         for product in products:
@@ -123,6 +122,7 @@ def verify_sign_up(data):
             message = "Atleast one field contains an empty input"
             return False, message
     return True, "success"
+
 
 def verify_login(data):
     if "username" not in data or "password" not in data:

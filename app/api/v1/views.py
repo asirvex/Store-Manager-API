@@ -159,6 +159,7 @@ class SignUp(Resource):
             return make_response(
                 jsonify({"message": verify_sign_up(data)[1]}), 400
             )
+
         first_name = data["first_name"]
         second_name = data["second_name"]
         username = data["username"]
@@ -172,10 +173,11 @@ class SignUp(Resource):
             return make_response(
                 jsonify({"message": password_validate(password)[1]}), 400
             )
+        
         user_id = generate_userid(store_attendants)
         admin.add_store_attendant(user_id, username, first_name, second_name, password)
         return make_response(
-            jsonify({"message": "user added succesfully", "SDF": password}), 201
+            jsonify({"message": "user added succesfully"}), 201
         )
-        print(store_attendants)
-        print("KSJFGKLJLJKL")
+
+
