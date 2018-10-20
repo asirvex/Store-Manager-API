@@ -5,12 +5,13 @@ import jwt
 import datetime
 from flask_restful import Resource
 from flask import jsonify, request, make_response
+from instance.config import Config
 from .models import store_attendants, products, Product, Admin, StoreAttendant
 from .models import admin, sales, Sale, attendant
 from .utils import validate_product_input, exists, validate_sales_input
-from .utils import product_exists, right_quantity, subtract_quantity, total_price
-from .utils import verify_sign_up, generate_userid, password_validate, verify_login
-from instance.config import Config
+from .utils import product_exists, right_quantity, subtract_quantity, \ 
+total_price, verify_sign_up, generate_userid, password_validate, verify_login
+
 
 def token_auth(func):
     @wraps(func)
@@ -34,13 +35,14 @@ def token_auth(func):
         return func(current_user, *args, **kwags)
     return decorated
 
+
 class Products(Resource):
     @token_auth
     def get(current_user, self):
         data = []
         if not products:
             return make_response(
-                jsonify({"message": "no product found"}),404
+                jsonify({"message": "no product found"}), 404
                 )
         for product in products:
             data.append(product.get_all_attributes())
@@ -63,7 +65,9 @@ class Products(Resource):
             return make_response(
                 jsonify({"message": "product name already exists"}), 400
             )
-        admin.add_product(data["name"], data["description"], data["quantity"], data["price"])
+        admin.add_product(
+            data["name"], data["description"], data["quantity"], data["price"]
+            )
         return make_response(
             jsonify({"message": "Product added successfully"}), 201
             )
@@ -74,7 +78,7 @@ class SpecificProduct(Resource):
     def get(current_user, self):
         if not products:
             return make_response(
-                jsonify({"message": "no product found"}),404
+                jsonify({"message": "no product found"}), 404
                 )
         product_id = int(product_id)
         data = {}
@@ -135,18 +139,22 @@ class Login(Resource):
             return make_response(
                 jsonify({"message": verify_login(data)[1]}), 400
             )
-        username=data["username"]
-        password=data["password"]
+        username = data["username"]
+        password = data["password"]
         token = None
         exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
         for user in store_attendants:
-            if username==user.get_username() and check_password_hash(user.get_password(), password):
-                token = jwt.encode({"username": user.get_username(), "exp":exp}, Config.secret_key)
-                resp= make_response(
+            if username == user.get_username() \
+              and check_password_hash(user.get_password(), password):
+                token = jwt.encode(
+                    {
+                        "username": user.get_username(), "exp": exp
+                    }, Config.secret_key)
+                resp = make_response(
                     jsonify({"token": token.decode("UTF-8")}), 200
                 )
         if not token:
-            resp=make_response(
+            resp = make_response(
                 jsonify({"message": "could not log you in"}), 401
             )
         return resp
@@ -168,14 +176,15 @@ class SignUp(Resource):
                 return make_response(
                     jsonify({"message": "username already taken"}), 400
                 )
-        password = generate_password_hash(data["password"])
         if not password_validate(password)[0]:
             return make_response(
                 jsonify({"message": password_validate(password)[1]}), 400
             )
-        
+        password = generate_password_hash(data["password"])
         user_id = generate_userid(store_attendants)
-        admin.add_store_attendant(user_id, username, first_name, second_name, password)
+        admin.add_store_attendant(
+            user_id, username, first_name, second_name, password
+            )
         return make_response(
             jsonify({"message": "user added succesfully"}), 201
         )
