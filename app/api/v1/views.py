@@ -1,4 +1,5 @@
 from datetime import date
+import os
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -9,8 +10,9 @@ from instance.config import Config
 from .models import store_attendants, products, Product, Admin, StoreAttendant
 from .models import admin, sales, Sale, attendant
 from .utils import validate_product_input, exists, validate_sales_input
-from .utils import product_exists, right_quantity, subtract_quantity, \ 
-total_price, verify_sign_up, generate_userid, password_validate, verify_login
+from .utils import (product_exists, right_quantity, subtract_quantity,
+                    total_price, verify_sign_up, generate_userid,
+                    password_validate, verify_login)
 
 
 def token_auth(func):
@@ -21,16 +23,16 @@ def token_auth(func):
             token = request.headers["access_token"]
         if not token:
             return make_response(
-                jsonify({"message" : "token required"}), 401
+                jsonify({"message": "token required"}), 401
             )
-        token_data = jwt.decode(token, Config.secret_key)
+        token_data = jwt.decode(token, os.getenv("SECRET_KEY"))
         try:
             for user in store_attendants:
                 if user.get_username() == token_data["username"]:
                     current_user = user
         except Exception:
             return make_response(
-                jsonify({"message":"invalid token"}), 401
+                jsonify({"message": "invalid token"}), 401
             )
         return func(current_user, *args, **kwags)
     return decorated
@@ -72,10 +74,10 @@ class Products(Resource):
             jsonify({"message": "Product added successfully"}), 201
             )
 
-        
+
 class SpecificProduct(Resource):
     @token_auth
-    def get(current_user, self):
+    def get(current_user, self, product_id):
         if not products:
             return make_response(
                 jsonify({"message": "no product found"}), 404
@@ -83,7 +85,7 @@ class SpecificProduct(Resource):
         product_id = int(product_id)
         data = {}
         for product in products:
-            if int(product.get_id()) == product:
+            if product.get_id() == product:
                 data["name"] = product.get_name()
                 data["id"] = product.get_id()
                 data["quantity"] = product.get_quantity()
@@ -139,8 +141,8 @@ class Login(Resource):
             return make_response(
                 jsonify({"message": verify_login(data)[1]}), 400
             )
-        username = data["username"]
-        password = data["password"]
+        username = data["username"].strip()
+        password = data["password"].strip()
         token = None
         exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
         for user in store_attendants:
@@ -149,7 +151,7 @@ class Login(Resource):
                 token = jwt.encode(
                     {
                         "username": user.get_username(), "exp": exp
-                    }, Config.secret_key)
+                    }, os.getenv("SECRET_KEY"))
                 resp = make_response(
                     jsonify({"token": token.decode("UTF-8")}), 200
                 )
@@ -176,9 +178,9 @@ class SignUp(Resource):
                 return make_response(
                     jsonify({"message": "username already taken"}), 400
                 )
-        if not password_validate(password)[0]:
+        if not password_validate(data["password"])[0]:
             return make_response(
-                jsonify({"message": password_validate(password)[1]}), 400
+                jsonify({"message": password_validate(data["password"])[1]}), 400
             )
         password = generate_password_hash(data["password"])
         user_id = generate_userid(store_attendants)

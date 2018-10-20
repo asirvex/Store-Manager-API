@@ -14,11 +14,11 @@ class TestApi(unittest.TestCase):
                         "username": admin.get_username(),
                         "first_name": admin.get_first_name(),
                         "second_name": admin.get_second_name(),
-                        "password": "pwd"
+                        "password": "pwdhrdnd"
                         })
         self.admin_login_details = json.dumps({
-            "username": "main_admin",
-            "password": "pwd"
+            "username": "super_admin",
+            "password": "pwdhrdnd"
             })
 
         admin_login = self.test_client.post("/api/v1/auth/login",
@@ -26,7 +26,8 @@ class TestApi(unittest.TestCase):
                                             headers={
                                              'content-type': 'application/json'
                                             })
-
+        print(json.loads(admin_login.data.decode())["token"])
+        print("KJHSDFKJGHDJKSGHKDFHGJK")
         self.access_token = json.loads(admin_login.data.decode())["token"]
         self.attendant = json.dumps({
                         "username": "sharon",
@@ -35,23 +36,27 @@ class TestApi(unittest.TestCase):
                         "role": "attendant",
                         "password": "wqttos"
                         })
-        self.attendant_login_details = json.dumps({
-                                                 "username": "sharon",
-                                                 "password": "wqttos"
-                                                 })
-        signup_attendant = self.test_client.post("/api/v1/auth/signup",
-                                                 data=self.attendant,
-                                                 headers={
-                                                  'content-type': 'application/json'
-                                                 })
+        self.attendant_login_details = json.dumps(
+            {
+                "username": "sharon",
+                "password": "wqttos"
+            })
+        self.signup_attendant = self.test_client.post(
+            "/api/v1/auth/signup",
+            data=self.attendant,
+            headers={
+                'content-type': 'application/json'
+            })
+        self.login_attendant = self.test_client.post(
+            "/api/v1/auth/login",
+            data=self.attendant_login_details,
+            headers={
+                'content-type': 'application/json'
+            })
 
-        login_attendant = self.test_client.post("/api/v1/auth/login",
-                                                data=self.attendant_login_details,
-                                                headers={
-                                                 'content-type': 'application/json'
-                                                })
-
-        self.user_token = json.loads(login_attendant.data.decode())["token"]
+        self.user_token = json.loads(
+            self.login_attendant.data.decode())["token"]
+        
         self.product1 = json.dumps(
             {
                 "name": "milk 500ml",
@@ -59,6 +64,7 @@ class TestApi(unittest.TestCase):
                 "price": 50,
                 "quantity": 10
             })
+
         self.product2 = json.dumps(
             {
                 "name": "jacket",
@@ -110,29 +116,47 @@ class TestApi(unittest.TestCase):
                 }
             )
         self.assertEqual(resp.status_code, 201)
+    
+    def test_sign_up_without_all_parameters(self):
+        resp = self.test_client.post(
+            "/api/v1/auth/signup",
+            data=json.dumps(
+                {
+                    "username": "owen",
+                    "password": "dhgjytd"
+                }
+            ),
+            headers={
+                "content-type": "application/json"
+            }
+        )
+        self.assertEqual(resp.status_code, 400)
 
     def test_without_token_product_post(self):
-        resp = self.test_client.post("/api/v1/products",
-                                data=json.dumps({
-                                    "name": "pr",
-                                    "price": 845,
-                                    "description": "the product is great"
-                                        }),
-                                headers={
-                                            'content-type': 'application/json'
-                                        })
+        resp = self.test_client.post(
+            "/api/v1/products",
+            data=json.dumps(
+                {
+                    "name": "pr",
+                    "price": 845,
+                    "description": "the product is great"
+                }),
+            headers={
+                    'content-type': 'application/json'
+                })
         self.assertEqual(resp.status_code, 401)
 
     def test_post_sale_without_token(self):
-        resp = self.test_client.post("/api/v1/products",
-                                data=json.dumps({
-                                    "name": "hard disk",
-                                    "price": 45,
-                                    "quantity": 54
-                                }),
-                                headers={
-                                    "content-type": "application/json"
-                                })
+        resp = self.test_client.post(
+            "/api/v1/products",
+            data=json.dumps({
+                "name": "hard disk",
+                "price": 45,
+                "quantity": 54
+            }),
+            headers={
+                "content-type": "application/json"
+            })
         self.assertEqual(resp.status_code, 401)
 
     def test_for_successful_product_add(self):
@@ -203,11 +227,11 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
 
     def test_getting_one_product(self):
-        resp = self.test_client.get("/api/v1/products/42",
+        resp = self.test_client.get("/api/v1/products/1",
                                     headers={
                                         "access_token": self.access_token
                                             })
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 200)
 
     def test_get_all_sales(self):
         resp = self.test_client.get("/api/v1/products",

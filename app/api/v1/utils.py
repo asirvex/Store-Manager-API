@@ -67,6 +67,7 @@ def validate_sales_input(products_list):
     
     return True, "Success"
 
+
 def product_exists(products_list):
     print(type(products_list))
     i=0
@@ -75,7 +76,7 @@ def product_exists(products_list):
             if item["name"] == product.get_name():
                 i += 1
     if i == len(products_list):
-        return True, "success"
+        return True, "success" 
     message = "The product in the order at position " +str(i+1) +" does not exist"
     return False, message
 
@@ -89,7 +90,7 @@ def right_quantity(products_list):
                     i += 1
     if i == len(products_list):
         return True, "success"
-    message = "The quantity is not enough to make order at position " +str(i+1) +" "
+    message = "The quantity is not enough to make order at position " + str(i+1) + " "
     return False, message
                                             
 def total_price(products_list):
