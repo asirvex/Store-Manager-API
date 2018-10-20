@@ -15,14 +15,14 @@ from instance.config import Config
 def token_auth(func):
     @wraps(func)
     def decorated(*args, **kwags):
-        token= None
+        token = None
         if "access_token" in request.headers:
-            token=request.headers["access_token"]
+            token = request.headers["access_token"]
         if not token:
             return make_response(
-                jsonify({"message":"token required"}), 401
+                jsonify({"message" : "token required"}), 401
             )
-        token_data=jwt.decode(token, Config.secret_key)
+        token_data = jwt.decode(token, Config.secret_key)
         try:
             for user in store_attendants:
                 if user.get_username() == token_data["username"]:
@@ -37,7 +37,7 @@ def token_auth(func):
 class Products(Resource):
     @token_auth
     def get(current_user, self):
-        data=[]
+        data = []
         if not products:
             return make_response(
                 jsonify({"message": "no product found"}),404
@@ -164,7 +164,7 @@ class SignUp(Resource):
         second_name = data["second_name"]
         username = data["username"]
         for user in store_attendants:
-            if user.get_username()==username:
+            if user.get_username() == username:
                 return make_response(
                     jsonify({"message": "username already taken"}), 400
                 )
