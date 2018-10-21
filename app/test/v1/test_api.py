@@ -55,7 +55,8 @@ class TestApi(unittest.TestCase):
             })
 
         self.user_token = json.loads(
-            self.login_attendant.data.decode())["token"]
+            self.login_attendant.data.decode()
+            )["token"]
         
         self.product1 = json.dumps(
             {
@@ -92,7 +93,7 @@ class TestApi(unittest.TestCase):
                                     'content-type': 'application/json',
                                     'access_token': self.access_token
                                       })
-        self.test_client.post("/api/v1/sales", data=self.sale,
+        self.test_client.post("/api/v1/sales", data=self.product2,
                               headers={
                                         'content-type': 'application/json',
                                         'access_token': self.user_token
@@ -132,7 +133,7 @@ class TestApi(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, 400)
 
-    def test_without_token_product_post(self):
+    def test_post_product_without_token(self):
         resp = self.test_client.post(
             "/api/v1/products",
             data=json.dumps(
@@ -146,6 +147,17 @@ class TestApi(unittest.TestCase):
                 })
         self.assertEqual(resp.status_code, 401)
 
+    def test_get_products_without_token(self):
+        resp = self.test_client.post(
+            "/api/v1/products")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_get_one_product_without_token(self):
+        resp =self.test_client.post("api/v1/products")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_get_one_product_without_token()
+
     def test_post_sale_without_token(self):
         resp = self.test_client.post(
             "/api/v1/products",
@@ -157,6 +169,25 @@ class TestApi(unittest.TestCase):
             headers={
                 "content-type": "application/json"
             })
+        self.assertEqual(resp.status_code, 401)
+
+    def test_get_sale_without_token(self):
+        resp = self.test_client.get("/api/v1/products")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_post_product_with_normal_account(self):
+        resp = self.test_client.post(
+            "/api/v1/products",
+            data=json.dumps({
+                "name": "unique product",
+                "description": "the product is really unique",
+                "quantity": 42,
+                "price": 100
+            }),
+            headers={
+                'access_token': self.user_token,
+                'content-type': 'application/json'
+                    })
         self.assertEqual(resp.status_code, 401)
 
     def test_for_successful_product_add(self):
@@ -199,24 +230,23 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
 
     def test_post_sale(self):
-        resp = self.test_client.post("/api/v1/sales",
-                                data=json.dumps([{
-                                "name": "milk 500ml",
-                                "description": "sweet fresh milk",
-                                "price": 50,
-                                "quantity": 10
-                                },
-                                {
-                                    "name": "jacket",
-                                    "description": "brown leather jacket",
-                                    "price": 1200,
-                                    "quantity": 50
-                                }
-                                ]),
-                                headers={
-                                'access_token': self.access_token,
-                                'content-type': 'application/json'
-                                    })
+        resp = self.test_client.post(
+            "/api/v1/sales",
+            data=json.dumps([{
+                "name": "milk 500ml",
+                "description": "sweet fresh milk",
+                "price": 50,
+                "quantity": 10
+            }, {
+                "name": "jacket",
+                "description": "brown leather jacket",
+                "price": 1200,
+                "quantity": 50
+            }]),
+            headers={
+                'access_token': self.access_token,
+                'content-type': 'application/json'
+            })
         self.assertEqual(resp.status_code, 400)
 
     def test_login_with_no_credentials_given(self):
@@ -225,6 +255,30 @@ class TestApi(unittest.TestCase):
                                     'content-type': 'application/json'
                                 })
         self.assertEqual(resp.status_code, 400)
+
+    def test_login_with_wrong_password(self):
+        resp = self.test_client.post(
+            "/api/v1/auth/login",
+            data=json.dumps({
+                "username": "sharon",
+                "password": "complicatedpwd"
+                }),
+            headers={
+                "content-type": "application/json"
+            })
+        self.assertEqual(resp.status_code, 401)
+
+    def test_login_without_an_account(self):
+        resp = self.test_client.post(
+            "/api/v1/auth/login",
+            data=json.dumps({
+                "username": "noaccount",
+                "password": "complicatedpwd"
+                }),
+            headers={
+                "content-type": "application/json"
+            })
+        self.assertEqual(resp.status_code, 401)
 
     def test_getting_one_product(self):
         resp = self.test_client.get("/api/v1/products/1",
@@ -254,12 +308,27 @@ class TestApi(unittest.TestCase):
     def test_wrong_product_keys(self):
         resp = self.test_client.post("/api/v1/login",
                                 data=json.dumps({
-                                    "unrelate":"milk 500ml",
+                                    "unrelated": "milk 500ml",
                                     "another": 50,
-                                    "test": ""})
-                                ,
+                                    "test": ""}),
                                 headers={
                                         "access_token": self.access_token,
                                         "content-type": "application/json"
                                     })
         self.assertEqual(resp.status_code, 404)
+
+    def test_sign_up_short_password(self):
+        resp = self.test_client.post(
+            "/api/v1/login",
+            data=json.dumps({
+                "name": "testsu",
+                "first_name": "test",
+                "second_name": "signup",
+                "password": "pwd"
+            }),
+            headers={
+                "content-type": "application/json"
+            })
+        self.assertEqual(resp.status_code, 404)
+
+    
