@@ -27,7 +27,7 @@ def token_auth(func):
             )
         current_user = None
         try:
-            token_data = jwt.decode(token, os.getenv("SECRET_KEY"))
+            token_data = jwt.decode(token, Config.secret_key)
         except:
             return make_response(
                 jsonify({"message": "invalid token"}), 401
