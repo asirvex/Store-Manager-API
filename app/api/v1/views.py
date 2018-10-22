@@ -109,7 +109,7 @@ class Sales(Resource):
         data = current_user.view_sales()
         if not data:
             return make_response(
-                jsonify({"message":"no sales available"}), 404
+                jsonify({"message": "no sales available"}), 404
             )
         return make_response(
             jsonify(data), 200

@@ -66,10 +66,15 @@ class Admin(StoreAttendant):
         """creates a product object and appends it to the products dictionary"""
         name = Product(name, description, Quantity, price)
         products.append(name)
-    
 
+    def view_sales(self):
+        my_sales=[]
+        for sale in sales:
+                my_sales.append(sale.get_dict())
+        
+        return my_sales
 
- 
+        
 class Product():
     """creates a product object"""
     def __init__(self, name, description, quantity, price):
