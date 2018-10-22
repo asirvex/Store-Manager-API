@@ -66,19 +66,22 @@ class Products(Resource):
                 jsonify({"message": "only the admin can add a product"}), 401
             )
         data = request.get_json()
+        prd = []
         if not validate_product_input(data)[0]:
             return make_response(
                 jsonify({"message": validate_product_input(data)[1]}), 400
                 )
+        for product in products:
+            prd.append(product.get_all_attributes())
         if exists(data["name"], products):
             return make_response(
-                jsonify({"message": "product name already exists"}), 400
+                jsonify({"message": "product name already exists", "products": prd}), 400
             )
         admin.add_product(
             data["name"], data["description"], data["quantity"], data["price"]
             )
         return make_response(
-            jsonify({"message": "Product added successfully"}), 201
+            jsonify({"message": "Product added successfully", "product": data}), 201
             )
 
 
@@ -138,7 +141,7 @@ class Sales(Resource):
         subtract_quantity(data)
         current_user.create_sale(ddata["sale_id"], ddata["date"], current_user.get_username(), ddata["products_sold"], ddata["total_price"] )
         return make_response(
-            jsonify({"message": "sale added successfully"}), 201
+            jsonify({"message": "sale added successfully", "sale": ddata}), 201
         )
 
 
@@ -216,11 +219,17 @@ class SignUp(Resource):
             )
         password = generate_password_hash(data["password"])
         user_id = generate_userid(store_attendants)
+
         admin.add_store_attendant(
             user_id, username, first_name, second_name, password
             )
         return make_response(
-            jsonify({"message": "user added succesfully"}), 201
+            jsonify({"message": "user added succesfully", "user": {
+                "user_id": user_id,
+                "username": username,
+                "first name": first_name,
+                "second name": second_name
+            }}), 201
         )
 
 
