@@ -143,7 +143,7 @@ class Sale():
 
 def clear_lists():
     products.clear()
-    sales.clear
+    sales.clear()
 
 admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
 attendant = StoreAttendant(12, "example", "brayo", "atenda", generate_password_hash("pwdhrdnd"))

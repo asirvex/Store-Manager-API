@@ -26,8 +26,6 @@ class TestApi(unittest.TestCase):
                                             headers={
                                              'content-type': 'application/json'
                                             })
-        print(json.loads(admin_login.data.decode())["token"])
-        print("KJHSDFKJGHDJKSGHKDFHGJK")
         self.access_token = json.loads(admin_login.data.decode())["token"]
         self.attendant = json.dumps({
                         "username": "sharon",
@@ -189,6 +187,10 @@ class TestApi(unittest.TestCase):
 
     def test_get_one_product_without_token(self):
         resp = self.test_client.get("api/v1/products/1")
+        self.assertEqual(resp.status_code, 401)
+    
+    def test_get_one_sale_without_token(self):
+        resp = self.test_client.get("api/v1/sales/1")
         self.assertEqual(resp.status_code, 401)
 
     def test_post_sale_without_token(self):
@@ -413,6 +415,21 @@ class TestApi(unittest.TestCase):
                                     headers={
                                         "access_token": self.access_token
                                             })
+        self.assertEqual(resp.status_code, 200)
+
+    def test_getting_unexistant_sale(self):
+        resp = self.test_client.get("/api/v1/sales/155",
+                                    headers={
+                                        "access_token": self.access_token
+                                            })
+        self.assertEqual(resp.status_code, 404)
+
+    def test_get_one_sale_with_token(self):
+        resp = self.test_client.get(
+            "/api/v1/sales/1",
+            headers={
+                "access_token": self.user_token
+            })
         self.assertEqual(resp.status_code, 200)
 
     def test_getting_one_product_without_token(self):
