@@ -9,7 +9,7 @@ before_script:
 
 script:
  - nosetests
- - nosetests --cov=app
+ - nosetests --with-coverage --cover-package=app
 
 after_success:
  - coveralls
