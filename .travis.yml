@@ -4,13 +4,12 @@ python:
 cache: pip
 install:
  - pip install -r requirements.txt
- - pip install coveralls
 before_script:
  - export SECRET_KEY="secret"
 
 script:
- - pytest
- - pytest --cov=app
+ - nosetests
+ - nosetests --cov=app
 
 after_success:
  - coveralls
