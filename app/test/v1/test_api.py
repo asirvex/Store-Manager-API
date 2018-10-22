@@ -109,7 +109,7 @@ class TestApi(unittest.TestCase):
         self.test_client.post("/api/v1/sales", data=self.sale,
                               headers={
                                         'content-type': 'application/json',
-                                        'access_token': self.access_token
+                                        'access_token': self.user_token
                                         })
         self.context = self.app.app_context()
         self.context.push()
@@ -264,6 +264,14 @@ class TestApi(unittest.TestCase):
             "/api/v1/sales",
             headers = {
                 "access_token": self.access_token
+            })
+        self.assertEqual(resp.status_code, 200)
+
+    def test_get_sales_with_user_token(self):
+        resp = self.test_client.get(
+            "/api/v1/sales",
+            headers = {
+                "access_token": self.user_token
             })
         self.assertEqual(resp.status_code, 200)
 
