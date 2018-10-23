@@ -1,5 +1,6 @@
-[![Coverage Status](https://coveralls.io/repos/github/asirvex/Store-Manager-API/badge.svg)](https://coveralls.io/github/asirvex/Store-Manager-API)
-<a href="https://codeclimate.com/github/asirvex/Fast-Food-API/maintainability"><img src="https://api.codeclimate.com/v1/badges/8c5bc842bc44fc7b1e26/maintainability" /></a>
+[![Build Status](https://travis-ci.org/asirvex/Store-Manager-API.svg?branch=develop)](https://travis-ci.org/asirvex/Store-Manager-API)
+[![Coverage Status](https://coveralls.io/repos/github/asirvex/Store-Manager-API/badge.svg?branch=develop)](https://coveralls.io/github/asirvex/Store-Manager-API?branch=develop)
+[![Maintainability](https://api.codeclimate.com/v1/badges/8c5bc842bc44fc7b1e26/maintainability)](https://codeclimate.com/github/asirvex/Fast-Food-API/maintainability)
 
 Heroku link https://asava-store-manager.herokuapp.com/
 
