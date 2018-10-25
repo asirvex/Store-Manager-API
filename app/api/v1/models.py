@@ -71,7 +71,6 @@ class Admin(StoreAttendant):
         my_sales=[]
         for sale in sales:
                 my_sales.append(sale.get_dict())
-        
         return my_sales
 
         
@@ -108,6 +107,7 @@ class Product():
             }
 
 class Sale():
+    """creates a sale object"""
     def __init__(self, sale_id, date, owner, products_sold, total_price):
         self.sale_id = sale_id
         self.date = date
@@ -132,10 +132,10 @@ class Sale():
 
     def get_dict(self):
         attributes_dict = {
-            "sale_id" : self.sale_id,
-            "date" : self.date,
-            "owner" : self.owner,
-            "products sold" : self.products_sold,
+            "sale_id": self.sale_id,
+            "date": self.date,
+            "owner": self.owner,
+            "products sold": self.products_sold,
             "total price": self.total_price
         }
         return attributes_dict

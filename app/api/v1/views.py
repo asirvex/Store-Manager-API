@@ -16,6 +16,7 @@ from .utils import (product_exists, right_quantity, subtract_quantity,
 
 
 def token_auth(func):
+    """a wrapper function for methods that need jwt authentification"""
     @wraps(func)
     def decorated(*args, **kwags):
         token = None
@@ -46,8 +47,10 @@ def token_auth(func):
 
 
 class Products(Resource):
+    """contains methods for route /api/v1/products"""
     @token_auth
     def get(current_user, self):
+        """gets all the products"""
         data = []
         if not products:
             return make_response(
@@ -61,6 +64,7 @@ class Products(Resource):
 
     @token_auth  
     def post(current_user, self):
+        """adds a new product"""
         if not current_user.get_admin_status():
             return make_response(
                 jsonify({"message": "only the admin can add a product"}), 401
@@ -83,8 +87,10 @@ class Products(Resource):
 
 
 class SpecificProduct(Resource):
+    """contains the methods for route /api/v1/products/<product_id>"""
     @token_auth
     def get(current_user, self, product_id):
+        """gets one product based on the id provided"""
         if not products:
             return make_response(
                 jsonify({"message": "no product found"}), 404
@@ -104,8 +110,10 @@ class SpecificProduct(Resource):
 
 
 class Sales(Resource):
+    """contains the methods for route /api/v1/sales"""
     @token_auth
     def get(current_user, self):
+        """gets all sales based on the user"""
         data = current_user.view_sales()
         if not data:
             return make_response(
@@ -117,6 +125,7 @@ class Sales(Resource):
 
     @token_auth
     def post(current_user, self):
+        """adds a new sale"""
         data = request.get_json()
         ddata = {}
         if not validate_sales_input(data)[0]:
@@ -143,6 +152,7 @@ class Sales(Resource):
 
 
 class SpecificSale(Resource):
+    """contains the methods for route /api/v1/sales/<sale_id>"""
     @token_auth
     def get(current_user, self, sale_id):
         try:
@@ -167,7 +177,9 @@ class SpecificSale(Resource):
         
 
 class Login(Resource):
+    """contains the post method for the login route /api/v1/auth/login"""
     def post(self):
+        """logins the user and provides a token"""
         data = request.get_json()
         if not verify_login(data)[0]:
             return make_response(
@@ -195,7 +207,9 @@ class Login(Resource):
 
 
 class SignUp(Resource):
+    """contains the post method for route /api/v1/auth/signup"""
     def post(self):
+        """creates a new storeattendant"""
         data = request.get_json()
         if not verify_sign_up(data)[0]:
             return make_response(
@@ -222,5 +236,3 @@ class SignUp(Resource):
         return make_response(
             jsonify({"message": "user added succesfully"}), 201
         )
-
-

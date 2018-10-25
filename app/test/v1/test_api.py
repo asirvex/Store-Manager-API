@@ -133,15 +133,15 @@ class TestApi(unittest.TestCase):
         resp = self.test_client.post(
             "/api/v1/auth/signup",
             data=json.dumps({"username": "brandon",
-                    "first_name": "",
-                    "second_name": "",
-                    "password": "sfowskv"}),
+                             "first_name": "",
+                             "second_name": "",
+                             "password": "sfowskv"}),
             headers={
                 'content-type': 'application/json'
                 }
             )
         self.assertEqual(resp.status_code, 400)
-    
+
     def test_sign_up_without_all_parameters(self):
         resp = self.test_client.post(
             "/api/v1/auth/signup",
@@ -156,7 +156,6 @@ class TestApi(unittest.TestCase):
             }
         )
         self.assertEqual(resp.status_code, 400)
-
 
     def test_post_product_without_token(self):
         resp = self.test_client.post(

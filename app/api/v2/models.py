@@ -1,7 +1,11 @@
 from werkzeug.security import generate_password_hash
+from database import Db
 store_attendants = []
 products = []
 sales = []
+
+db = Db()
+db.create_tables()
 
 
 class StoreAttendant():
@@ -67,6 +71,8 @@ class Admin(StoreAttendant):
         name = Product(name, description, Quantity, price)
         products.append(name)
 
+               
+
     def view_sales(self):
         my_sales=[]
         for sale in sales:
@@ -107,7 +113,9 @@ class Product():
             "price": self.price
             }
 
+
 class Sale():
+    """creates a sale object"""
     def __init__(self, sale_id, date, owner, products_sold, total_price):
         self.sale_id = sale_id
         self.date = date
@@ -132,13 +140,17 @@ class Sale():
 
     def get_dict(self):
         attributes_dict = {
-            "sale_id" : self.sale_id,
-            "date" : self.date,
-            "owner" : self.owner,
-            "products sold" : self.products_sold,
+            "sale_id": self.sale_id,
+            "date": self.date,
+            "owner": self.owner,
+            "products sold": self.products_sold,
             "total price": self.total_price
         }
         return attributes_dict
+
+
+
+
 
 
 def clear_lists():
@@ -148,3 +160,15 @@ def clear_lists():
 admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
 attendant = StoreAttendant(12, "example", "brayo", "atenda", generate_password_hash("pwdhrdnd"))
 store_attendants.append(admin)
+
+
+def create_store_attendants(self):
+    """creates store attendant objects from the database"""
+    sd = db.fetch_users()
+    for user in sd:
+        if not user["admin"]:
+            user["username"] = StoreAttendant(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
+            store_attendants.append(user["username"])
+        if user["admin"]:
+            user["username"] = Admin(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"]
+            store_attendants.append(user["username"])
