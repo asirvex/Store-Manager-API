@@ -109,3 +109,6 @@ class Db():
             product["price"] = row[4]
             products.append(product)
         return products
+
+
+    

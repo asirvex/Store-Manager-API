@@ -72,8 +72,10 @@ class Products(Resource):
             return make_response(
                 jsonify({"message": "product name already exists"}), 400
             )
+        data["id"] = len(products) + 1
         admin.add_product(
-            data["name"], data["description"], data["quantity"], data["price"]
+            data["id"], data["name"], data["description"],
+            data["quantity"], data["price"]
             )
         return make_response(
             jsonify({"message": "Product added successfully",

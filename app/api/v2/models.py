@@ -4,9 +4,6 @@ store_attendants = []
 products = []
 sales = []
 
-db = Db()
-db.create_tables()
-
 
 class StoreAttendant():
     """creates a store attendant object"""
@@ -66,9 +63,9 @@ class Admin(StoreAttendant):
         store_attendants.append(username)
         return "store attendant created successfully"
     
-    def add_product(self, name, description, Quantity, price):
+    def add_product(self, id, name, description, Quantity, price):
         """creates a product object and appends it to the products dictionary"""
-        name = Product(name, description, Quantity, price)
+        name = Product(id, name, description, Quantity, price)
         products.append(name)
 
                
@@ -83,8 +80,8 @@ class Admin(StoreAttendant):
         
 class Product():
     """creates a product object"""
-    def __init__(self, name, description, quantity, price):
-        self.id = len(products) + 1
+    def __init__(self, id, name, description, quantity, price):
+        self.id = id
         self.name = name
         self.description = description
         self.quantity = quantity
@@ -161,6 +158,8 @@ admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdn
 attendant = StoreAttendant(12, "example", "brayo", "atenda", generate_password_hash("pwdhrdnd"))
 store_attendants.append(admin)
 
+db = Db()
+db.create_tables()
 
 def create_store_attendants(self):
     """creates store attendant objects from the database"""
@@ -170,5 +169,12 @@ def create_store_attendants(self):
             user["username"] = StoreAttendant(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
             store_attendants.append(user["username"])
         if user["admin"]:
-            user["username"] = Admin(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"]
+            user["username"] = Admin(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
             store_attendants.append(user["username"])
+
+def create_products(self):
+    """creates product objects from the database"""
+    pd = db.fetch_products()
+    for product in pd:
+        product["name"] = Product(product["id"], product["name"], product["description"], product["quantity"], product["price"])
+        products.append(product)
