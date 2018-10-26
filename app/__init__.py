@@ -1,6 +1,6 @@
 from flask import Flask
 from instance.config import app_config
-from .api import v1
+from .api.v1 import v1
 
 def create_app(config_name):
     """app configuration"""
