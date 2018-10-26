@@ -8,11 +8,14 @@ from flask_restful import Resource
 from flask import jsonify, request, make_response
 from instance.config import Config
 from .models import store_attendants, products, Product, Admin, StoreAttendant
-from .models import admin, sales, Sale, attendant
+from .models import sales, Sale, attendant
 from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
                     total_price, verify_sign_up, generate_userid,
                     password_validate, verify_login)
+
+admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
+store_attendants.append(admin)
 
 
 def token_auth(func):
