@@ -7,11 +7,10 @@ Heroku link https://asava-store-manager.herokuapp.com/
 Steps to run the project
 
 1. Create a virtual environment with the command
-
-$ virtualenv -p python3 env
+  `$ virtualenv -p python3 env`
 
 1. Activate the env with the command
-$ source env/bin/activate
+`$ source env/bin/activate`
 
 1. Install git
 
@@ -20,25 +19,22 @@ $ source env/bin/activate
 1. cd into the folder Store-Manager-API
 
 1. install requirements
-
-$ pip install -r requirements.txt
+`$ pip install -r requirements.txt`
 
 1. export required enviroments
 
-$ export SECRET_KEY="anysecretkey"
-
-$ export APP_SETTINGS="development"
-
-$ export FLASK_APP="run.py"
+`$ export SECRET_KEY="anysecretkey"`
+`$ export APP_SETTINGS="development"`
+`$ export FLASK_APP="run.py"`
 
 1. Now you can run
-11. for the application run
 
-$ flask run
 
-11. for tests
+  11. for the application run
+  `$ flask run`
 
-$ nosetests
+  11. for tests
+  `$ nosetests`
 
 1. Test the endpoints using postman
 
