@@ -14,7 +14,7 @@ def password_validate(password):
 
 def exists(item_name, list_name):
     """Check if a particular item already exists in the storage"""
-    for item in list_name: 
+    for item in list_name:
         if item.get_name() == item_name:
             return True
 

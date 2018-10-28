@@ -6,8 +6,8 @@ class Db():
     """creates a connection and a cursor to manipulate the database"""
     def __init__(self):
         self.db_url = os.getenv("DATABASE_URL")
-        self.connect = psycopg2.connect(self.db_url)
-        self.cursor = self.connect.cursor()
+        self.connection = psycopg2.connect(self.db_url)
+        self.cursor = self.connection.cursor()
 
     def create_tables(self):
         """creates the database tables"""
@@ -27,62 +27,70 @@ class Db():
                 firstname TEXT NOT NULL,
                 secondname TEXT NOT NULL,
                 password TEXT NOT NULL,
-                admin BOOLEAN NOT NULL,
+                admin BOOLEAN NOT NULL
             );"""
             self.cursor.execute(self.users)
 
             self.sales = """CREATE TABLE IF NOT EXISTS sales(
                 id INT PRIMARY KEY NOT NULL,
+                date TEXT NOT NULL,
+                owner TEXT NOT NULL,
                 products TEXT NOT NULL,
                 totalprice REAL NOT NULL
             )"""
             self.cursor.execute(self.sales)
+            self.connection.commit()
 
         except psycopg2.Error as db_error:
-            print("tables not created")
+            print(db_error)
 
-    def insert_user(self, username, firstname, secondname, password):
+    def insert_user(self, id, username, firstname, secondname, password, admin):
         """inserts a user into the users table"""
+        self.id = id
         self.username = username
         self.firstname = firstname
         self.secondname = secondname
         self.password = password
+        self.admin = admin
         self.cursor.execute(
-            """INSERT INTO users(username, firstname, secondname, password)
-            VALUES(%s, %s, %s, %s)""",
-            (self.username, self.firstname, self.secondname, self.password)
+            """INSERT INTO users(employeeId, username, firstname, secondname, password, admin)
+            VALUES(%s, %s, %s, %s, %s, %s)""",
+            (self.id, self.username, self.firstname, self.secondname, self.password, self.admin)
         )
-        self.connect.commit()
+        self.connection.commit()
 
-    def insert_product(self, product_id, name, description, price):
+    def insert_product(self, product_id, name, description, quantity, price):
         """inserts a product into the database"""
         self.product_id = product_id
         self.name = name
         self.description = description
+        self.quantity = quantity
         self.price = price
         self.cursor.execute(
-            """INSERT INTO products(id, name, description, price)
-            VALUES(%s, %s, %s, %s)""",
-            (self.product_id, self.name, self.description, self.price)
+            """INSERT INTO products(id, name, description, quantity, price)
+            VALUES(%s, %s, %s, %s, %s)""",
+            (self.product_id, self.name, self.description, self.quantity, self.price)
         )
-        self.connect.commit()
+        self.connection.commit()
 
-    def insert_sale(self, sale_id, products, total_price):
+    def insert_sale(self, sale_id, date, owner, products, total_price):
         """inserts a sale into the database"""
         self.sale_id = sale_id
+        self.date = date
+        self.owner = owner
         self.products = products
         self.total_price = total_price
         self.cursor.execute(
-            """INSERT INTO sales(id, products, totalprice)
-            VALUES(%s, %s, %s)""",
-            (self.sale_id, self.products, self.total_price)
+            """INSERT INTO sales(id, date, owner, products, totalprice)
+            VALUES(%s, %s, %s, %s, %s)""",
+            (self.sale_id, self.date, self.owner, self.products, self.total_price)
         )
-        self.connect.commit()
+        self.connection.commit()
     
     def fetch_users(self):
         """fetchs the users from the database"""
         self.cursor.execute("SELECT * from users")
-        rows = self.cursor.fetch_all()
+        rows = self.cursor.fetchall()
         user = {}
         users = []
         for row in rows:
@@ -98,7 +106,7 @@ class Db():
     def fetch_products(self):
         """fetchs the users from the products table"""
         self.cursor.execute("SELECT * from products")
-        rows = self.cursor.fetch_all()
+        rows = self.cursor.fetchall()
         product = {}
         products = []
         for row in rows:
@@ -110,5 +118,19 @@ class Db():
             products.append(product)
         return products
 
+    def fetch_sales(self):
+        """fetchs the sales from the sales table"""
+        self.cursor.execute("SELECT * from sales")
+        rows = self.cursor.fetchall()
+        sale = {}
+        sales = []
+        for row in rows:
+            sale["id"] = row[0]
+            sale["date"] = row[1]
+            sale["owner"] = row[2]
+            sale["products"] = row[3]
+            sale["total_price"] = row[4]
+            sales.append(sale)
+        return sales
 
     

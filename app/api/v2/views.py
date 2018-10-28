@@ -8,11 +8,14 @@ from flask_restful import Resource
 from flask import jsonify, request, make_response
 from instance.config import Config
 from .models import store_attendants, products, Product, Admin, StoreAttendant
-from .models import admin, sales, Sale, attendant
+from .models import sales, Sale, FetchData
 from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
                     total_price, verify_sign_up, generate_userid,
                     password_validate, verify_login)
+
+admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
+store_attendants.append(admin)
 
 
 def token_auth(func):
@@ -43,10 +46,19 @@ def token_auth(func):
     return decorated
 
 
-class Products(Resource):
+class FetchDatabase():
+    def __init__(self):
+        fetch_data = FetchData()
+        fetch_data.create_store_attendants()
+        fetch_data.create_products()
+
+
+class Products(Resource, FetchDatabase):
     @token_auth
     def get(current_user, self):
         data = []
+        print("FINDER")
+        print(products)
         if not products:
             return make_response(
                 jsonify({"message": "no product found"}), 404
@@ -64,10 +76,8 @@ class Products(Resource):
                 jsonify({"message": "only the admin can add a product"}), 401
             )
         data = request.get_json()
-        if not validate_product_input(data)[0]:
-            return make_response(
+        if not validate_product_input(data)[0]: 
                 jsonify({"message": validate_product_input(data)[1]}), 400
-                )
         if exists(data["name"], products):
             return make_response(
                 jsonify({"message": "product name already exists"}), 400
@@ -83,7 +93,7 @@ class Products(Resource):
             )
 
 
-class SpecificProduct(Resource):
+class SpecificProduct(Resource, FetchDatabase):
     @token_auth
     def get(current_user, self, product_id):
         try: 
@@ -168,7 +178,7 @@ class SpecificProduct(Resource):
                 )
 
 
-class Sales(Resource):
+class Sales(Resource, FetchDatabase):
     @token_auth
     def get(current_user, self):
         data = current_user.view_sales()
@@ -201,7 +211,7 @@ class Sales(Resource):
         ddata["total_price"] = total_price(data)
         ddata["sale_id"] = len(sales)+1
         subtract_quantity(data)
-        current_user.create_sale(
+        current_user.add_sale(
             ddata["sale_id"], ddata["date"], current_user.get_username(),
             ddata["products_sold"], ddata["total_price"])
         return make_response(
@@ -209,7 +219,7 @@ class Sales(Resource):
         )
 
 
-class SpecificSale(Resource):
+class SpecificSale(Resource, FetchDatabase):
     @token_auth
     def get(current_user, self, sale_id):
         try:
@@ -234,7 +244,7 @@ class SpecificSale(Resource):
         )
         
 
-class Login(Resource):
+class Login(Resource, FetchDatabase):
     def post(self):
         data = request.get_json()
         if not verify_login(data)[0]:
@@ -262,7 +272,7 @@ class Login(Resource):
         return resp
 
 
-class SignUp(Resource):
+class SignUp(Resource, FetchDatabase):
     def post(self):
         data = request.get_json()
         if not verify_sign_up(data)[0]:
