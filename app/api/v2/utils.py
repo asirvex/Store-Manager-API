@@ -13,7 +13,7 @@ def password_validate(password):
     return True, "success"
 
 def exists(item_name, list_name):
-    """Check if a particular item already exists in the storage"""
+    """Check if a particular item already exists in the list"""
     for item in list_name:
         if item.get_name() == item_name:
             return True
@@ -65,7 +65,6 @@ def validate_sales_input(products_list):
 
 
 def product_exists(products_list):
-    print(type(products_list))
     i=0
     for item in products_list:
         for product in products:

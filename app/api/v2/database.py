@@ -91,9 +91,9 @@ class Db():
         """fetchs the users from the database"""
         self.cursor.execute("SELECT * from users")
         rows = self.cursor.fetchall()
-        user = {}
         users = []
         for row in rows:
+            user = {}
             user["employeeid"] = row[0]
             user["username"] = row[1]
             user["firstname"] = row[2]
@@ -107,9 +107,9 @@ class Db():
         """fetchs the users from the products table"""
         self.cursor.execute("SELECT * from products")
         rows = self.cursor.fetchall()
-        product = {}
         products = []
         for row in rows:
+            product = {}
             product["id"] = row[0]
             product["name"] = row[1]
             product["description"] = row[2]
@@ -122,9 +122,9 @@ class Db():
         """fetchs the sales from the sales table"""
         self.cursor.execute("SELECT * from sales")
         rows = self.cursor.fetchall()
-        sale = {}
         sales = []
         for row in rows:
+            sale = {}
             sale["id"] = row[0]
             sale["date"] = row[1]
             sale["owner"] = row[2]

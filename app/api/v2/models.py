@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash
 from .database import Db
+
 store_attendants = []
 products = []
 sales = []
@@ -33,9 +34,12 @@ class StoreAttendant():
     def get_admin_status(self):
         return self.admin
 
+    def get_name(self):
+        return self.username
+
     def add_sale(self, sale_id, date, owner, products_sold, total_price):
-        sale_id = Sale(sale_id, date, owner, products_sold, total_price)
-        sales.append(sale_id)
+        db = Db()
+        db.insert_sale(sale_id, date, owner, products_sold, total_price)
 
     def view_sales(self):
         my_sales=[]
@@ -148,6 +152,12 @@ def clear_lists():
     products.clear()
     sales.clear()
 
+def exists(item_name, ls):
+    """Check if a particular item already exists in the list"""
+    for item in ls:
+        if item.get_name() == item_name:
+            return True
+
 
 class FetchData():
     """Fetchs data from database and creates respective objects"""
@@ -155,24 +165,31 @@ class FetchData():
         self.db = Db()
         self.db.create_tables()
 
+    
+
     def create_store_attendants(self):
         """creates store attendant objects from the database"""
         sd = self.db.fetch_users()
         for user in sd:
-            if not user["admin"]:
-                user["username"] = StoreAttendant(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
-                store_attendants.append(user["username"])
-            if user["admin"]:
-                user["username"] = Admin(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
-                store_attendants.append(user["username"])
+            if not exists(user["username"], store_attendants):
+                if not user["admin"]:
+                    user["username"] = StoreAttendant(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
+                    store_attendants.append(user["username"])
+                else:
+                    user["username"] = Admin(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
+                    store_attendants.append(user["username"])
 
     def create_products(self):
         """creates product objects from the database"""
         pd = self.db.fetch_products()
+        products.clear()
         for product in pd:
             product["name"] = Product(product["id"], product["name"], product["description"], product["quantity"], product["price"])
             products.append(product["name"])
 
     def create_sales(self):
-        pass
-    
+        """creates sale objects from the database table sales"""
+        salesdata = self.db.fetch_sales()
+        for sale in salesdata:
+            sale["id"] = Sale(sale["id"], sale["date"], sale["owner"], sale["products"], sale["total_price"])
+            sales.append(sale["id"])

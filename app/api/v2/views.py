@@ -14,9 +14,6 @@ from .utils import (product_exists, right_quantity, subtract_quantity,
                     total_price, verify_sign_up, generate_userid,
                     password_validate, verify_login)
 
-admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
-store_attendants.append(admin)
-
 
 def token_auth(func):
     @wraps(func)
@@ -48,6 +45,10 @@ def token_auth(func):
 
 class FetchDatabase():
     def __init__(self):
+        products.clear()
+        store_attendants.clear()
+        admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
+        store_attendants.append(admin)
         fetch_data = FetchData()
         fetch_data.create_store_attendants()
         fetch_data.create_products()
@@ -57,8 +58,6 @@ class Products(Resource, FetchDatabase):
     @token_auth
     def get(current_user, self):
         data = []
-        print("FINDER")
-        print(products)
         if not products:
             return make_response(
                 jsonify({"message": "no product found"}), 404
