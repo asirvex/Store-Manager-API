@@ -13,7 +13,7 @@ from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
                     total_price, verify_sign_up, generate_userid,
                     password_validate, verify_login)
-
+from .database import Db
 
 def token_auth(func):
     @wraps(func)
@@ -48,6 +48,7 @@ class FetchDatabase():
         products.clear()
         store_attendants.clear()
         admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
+        self.db = Db()
         store_attendants.append(admin)
         fetch_data = FetchData()
         fetch_data.create_store_attendants()
@@ -76,16 +77,22 @@ class Products(Resource, FetchDatabase):
             )
         data = request.get_json()
         if not validate_product_input(data)[0]: 
+            return make_response(
                 jsonify({"message": validate_product_input(data)[1]}), 400
+            )
         if exists(data["name"], products):
             return make_response(
                 jsonify({"message": "product name already exists"}), 400
             )
-        data["id"] = len(products) + 1
-        admin.add_product(
-            data["id"], data["name"], data["description"],
-            data["quantity"], data["price"]
-            )
+        try:
+            self.db.insert_product(
+                data["id"], data["name"], data["description"],
+                data["quantity"], data["price"]
+                )
+        except:
+            return make_response(
+                jsonify({"message": "a product with the same id already exists"}), 400 
+                )
         return make_response(
             jsonify({"message": "Product added successfully",
                     "product": data}), 201

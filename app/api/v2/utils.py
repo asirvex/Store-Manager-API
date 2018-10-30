@@ -18,23 +18,42 @@ def exists(item_name, list_name):
         if item.get_name() == item_name:
             return True
 
+
 def validate_product_input(dictionary):
-    if "name" not in dictionary or "description" not in dictionary or "quantity" not in dictionary or "price" not in dictionary:
-        message = "Data input should contain 'name', 'description', 'quantity' and 'price' fields"
-        return False, message
+    if "id" not in dictionary:
+        return False, "Data should contain an id field"
+    if "name" not in dictionary:
+        return False, "Data input should contain a name field"
+    if "description" not in dictionary:
+        return False, "Data input should contain a description"
+    if "quantity" not in dictionary:
+        return False, "Data input should contain a quantity field"
+    if "price" not in dictionary:
+        return False, "Data input should contain a price field"
     
     for value in dictionary.values():
         if not value:
-            message = "Atleast one field contains an empty input"
+            message = "field  contains an empty input"
             return False, message
     try:
         dictionary["price"] = float(dictionary["price"])
     except:
         pass
-    if type(dictionary["name"]) is not str or type(dictionary["description"]) is not str or type(dictionary["quantity"]) is not int or type(dictionary["price"]) is not float:
-        message = "incorrect data types, data types should be: 'name' - string, 'description' - str, quantity - int, 'price' - float"
-        return False, message
-    
+    if type(dictionary["id"]) is not int:
+        return False, "id input should be an integer"
+
+    if type(dictionary["name"]) is not str:
+        return False, "name input should be a string" 
+
+    if type(dictionary["description"]) is not str:
+        return False, "description input should be a string"
+
+    if type(dictionary["quantity"]) is not int:
+        return False, "quantity input should be a string"
+
+    if type(dictionary["price"]) is not float:
+        return False, "price input should be a float or integer"
+
     return True, "success"
 
 
