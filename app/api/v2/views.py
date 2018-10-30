@@ -162,7 +162,7 @@ class SpecificProduct(Resource, FetchDatabase):
                     jsonify({"message": "Product details updated",
                              "product": product.get_all_attributes()})
                 )
-
+    @token_auth
     def delete(current_user, self, product_id):
         try:
             product_id = int(product_id)
@@ -175,13 +175,18 @@ class SpecificProduct(Resource, FetchDatabase):
             return make_response(
                 jsonify({"message": "only the admin can delete products"}), 401
             )
+        
         for product in products:
             if product.get_id() == product_id:
-                products.remove(product)
+                self.db.delete_product(product_id)
                 return make_response(
                     jsonify({"message": "product deleted successfully",
                              "product": product.get_all_attributes()})
                 )
+        return make_response(
+            jsonify({"message":
+                    "there is no product with that product id"}), 404
+        )
 
 
 class Sales(Resource, FetchDatabase):
