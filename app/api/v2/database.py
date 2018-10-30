@@ -136,8 +136,14 @@ class Db():
             sales.append(sale)
         return sales
 
+    def delete_product(self, product_id):
+        """deletes a product entry from the databasae"""
+        id = int(product_id)
+        self.cursor.execute("DELETE FROM products WHERE id = %s" % (id))
+        self.connection.commit()
 
 def destroy_tables():
+    """deletes the tables if present"""
     connection = psycopg2.connect(os.getenv("DATABASE_TESTING_URL"))
     cursor = connection.cursor()
     try:
