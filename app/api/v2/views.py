@@ -42,14 +42,14 @@ def token_auth(func):
         return func(current_user, *args, **kwags)
     return decorated
 
+admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
 
 class FetchDatabase():
     def __init__(self):
         products.clear()
         store_attendants.clear()
-        admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
-        self.db = Db()
         store_attendants.append(admin)
+        self.db = Db()
         fetch_data = FetchData()
         fetch_data.create_store_attendants()
         fetch_data.create_products()

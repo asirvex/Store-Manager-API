@@ -13,7 +13,7 @@ class Development(Config):
 
 class Testing(Config):
     """Configuration for testing environment"""
-    DEBUG = True
+    DEBUG = False
 
 class Production(Config):
     """Configuration for production environment"""

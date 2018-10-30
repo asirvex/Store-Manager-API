@@ -5,7 +5,10 @@ import os
 class Db():
     """creates a connection and a cursor to manipulate the database"""
     def __init__(self):
-        self.db_url = os.getenv("DATABASE_URL")
+        if os.getenv("APP_SETTINGS") == "development":
+            self.db_url = os.getenv("DATABASE_URL")
+        if os.getenv("APP_SETTINGS") == "testing":
+            self.db_url = os.getenv("DATABASE_TESTING_URL")
         self.connection = psycopg2.connect(self.db_url)
         self.cursor = self.connection.cursor()
 
@@ -37,7 +40,7 @@ class Db():
                 owner TEXT NOT NULL,
                 products TEXT NOT NULL,
                 totalprice REAL NOT NULL
-            )"""
+            );"""
             self.cursor.execute(self.sales)
             self.connection.commit()
 
@@ -133,4 +136,13 @@ class Db():
             sales.append(sale)
         return sales
 
-    
+
+def destroy_tables():
+    connection = psycopg2.connect(os.getenv("DATABASE_TESTING_URL"))
+    cursor = connection.cursor()
+    try:
+        cursor.execute("""DROP TABLE users;""")
+        cursor.execute("""DROP TABLE products;""")
+        cursor.execute("""DROP TABLE IF EXISTS sales;""")
+    except:
+        print("Tables destroyed")
