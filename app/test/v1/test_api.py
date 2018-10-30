@@ -3,7 +3,8 @@ import json
 
 from app import create_app
 from instance.config import app_config
-from app.api.v1.models import clear_lists, admin
+from app.api.v1.models import clear_lists
+from app.api.v1.views import admin
 
 
 class TestApi(unittest.TestCase):
