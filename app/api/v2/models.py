@@ -165,8 +165,6 @@ class FetchData():
         self.db = Db()
         self.db.create_tables()
 
-    
-
     def create_store_attendants(self):
         """creates store attendant objects from the database"""
         sd = self.db.fetch_users()
@@ -193,3 +191,9 @@ class FetchData():
         for sale in salesdata:
             sale["id"] = Sale(sale["id"], sale["date"], sale["owner"], sale["products"], sale["total_price"])
             sales.append(sale["id"])
+
+try:
+    db = Db()
+    db.insert_user(152, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"), admin=True)
+except:
+    pass

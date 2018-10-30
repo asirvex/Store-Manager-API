@@ -59,7 +59,7 @@ def validate_product_input(dictionary):
 
 def validate_sales_input(products_list):
     if type(products_list) is not list:
-        message = "The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys 1 "
+        message = "The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys "
         return False, message
     if not products_list:
         message = "Empty input, The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys 2 "
@@ -127,6 +127,14 @@ def generate_userid(store_attendants):
             if a_user.get_employee_id()==user_id:
                 return generate_userid(store_attendants)
     return user_id
+
+def generate_saleid(sales):
+    sale_id=random.randint(1, 10000)
+    if sales:
+        for sale in sales:
+            if sale.get_id() == sale_id:
+                return generate_saleid(sales)
+    return sale_id
 
 def verify_sign_up(data):
     if "username" not in data or "first_name" not in data or "second_name" not in data or "password" not in data:

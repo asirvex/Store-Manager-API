@@ -17,7 +17,7 @@ class Db():
         try:
             self.products = """CREATE TABLE IF NOT EXISTS products(
                 id INT PRIMARY KEY NOT NULL,
-                name TEXT NOT NULL,
+                name TEXT NOT NULL UNIQUE,
                 description TEXT NOT NULL,
                 quantity INT NOT NULL,
                 price REAL NOT NULL
@@ -35,17 +35,38 @@ class Db():
             self.cursor.execute(self.users)
 
             self.sales = """CREATE TABLE IF NOT EXISTS sales(
-                id INT PRIMARY KEY NOT NULL,
+                id INT PRIMARY KEY,
                 date TEXT NOT NULL,
-                owner TEXT NOT NULL,
-                products TEXT NOT NULL,
+                owner TEXT NOT NULL REFERENCES users (username),
                 totalprice REAL NOT NULL
             );"""
             self.cursor.execute(self.sales)
+
+            self.product_sales = """CREATE TABLE IF NOT EXISTS product_sales(
+                sale_id INT REFERENCES sales (id) ON UPDATE CASCADE ON DELETE CASCADE,
+                product_name TEXT REFERENCES products (name) ON UPDATE CASCADE,
+                quantity INT NOT NULL
+            );"""
+            self.cursor.execute(self.product_sales)
             self.connection.commit()
 
         except psycopg2.Error as db_error:
             print(db_error)
+    
+    def insert_sale(self, sale_id, date, owner, products, total_price):
+        self.cursor.execute(
+            """INSERT INTO sales(id, date, owner, totalprice)
+            VALUES(%s, %s, %s, %s)""", (sale_id, date, owner, total_price)
+        )
+        self.connection.commit()
+        for product in products:
+            product_name = product["name"]
+            quantity = product["quantity"]
+            self.cursor.execute(
+                """INSERT INTO product_sales(sale_id, product_name, quantity)
+                VALUES(%s, %s, %s)""", (sale_id, product_name, quantity)
+            )
+            self.connection.commit()
 
     def insert_user(self, id, username, firstname, secondname, password, admin):
         """inserts a user into the users table"""
@@ -76,20 +97,6 @@ class Db():
         )
         self.connection.commit()
 
-    def insert_sale(self, sale_id, date, owner, products, total_price):
-        """inserts a sale into the database"""
-        self.sale_id = sale_id
-        self.date = date
-        self.owner = owner
-        self.products = products
-        self.total_price = total_price
-        self.cursor.execute(
-            """INSERT INTO sales(id, date, owner, products, totalprice)
-            VALUES(%s, %s, %s, %s, %s)""",
-            (self.sale_id, self.date, self.owner, self.products, self.total_price)
-        )
-        self.connection.commit()
-    
     def fetch_users(self):
         """fetchs the users from the database"""
         self.cursor.execute("SELECT * from users")

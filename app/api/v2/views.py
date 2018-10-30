@@ -11,8 +11,8 @@ from .models import store_attendants, products, Product, Admin, StoreAttendant
 from .models import sales, Sale, FetchData
 from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
-                    total_price, verify_sign_up, generate_userid,
-                    password_validate, verify_login)
+                    total_price, verify_sign_up, generate_userid, verify_login,
+                    password_validate, generate_saleid)
 from .database import Db
 
 def token_auth(func):
@@ -220,9 +220,9 @@ class Sales(Resource, FetchDatabase):
         ddata["products_sold"] = data
         ddata["date"] = str(date.today())
         ddata["total_price"] = total_price(data)
-        ddata["sale_id"] = len(sales)+1
+        ddata["sale_id"] = generate_saleid(sales)
         subtract_quantity(data)
-        current_user.add_sale(
+        self.db.insert_sale(
             ddata["sale_id"], ddata["date"], current_user.get_username(),
             ddata["products_sold"], ddata["total_price"])
         return make_response(
@@ -253,7 +253,7 @@ class SpecificSale(Resource, FetchDatabase):
         return make_response(
             jsonify({"message": "you dont have a sale with that id"}), 404
         )
-        
+
 
 class Login(Resource, FetchDatabase):
     def post(self):
@@ -312,5 +312,3 @@ class SignUp(Resource, FetchDatabase):
         return make_response(
             jsonify({"message": "user added succesfully"}), 201
         )
-
-
