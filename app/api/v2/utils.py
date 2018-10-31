@@ -60,7 +60,7 @@ def validate_sales_input(products_list):
         message = "The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys "
         return False, message
     if not products_list:
-        message = "Empty input, The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys 2 "
+        message = "Empty input, The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys"
         return False, message
     for product in products_list:
         if "name" not in product or "quantity" not in product or "price" not in product:

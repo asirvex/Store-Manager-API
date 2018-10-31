@@ -80,6 +80,8 @@ class Products(Resource, FetchDatabase):
             return make_response(
                 jsonify({"message": validate_product_input(data)[1]}), 400
             )
+        data["name"] = data["name"].strip().lower()
+        data["description"] = data["description"].strip().lower()
         if exists(data["name"], products):
             return make_response(
                 jsonify({"message": "product name already exists"}), 400
@@ -102,7 +104,7 @@ class SpecificProduct(Resource, FetchDatabase):
             product_id = int(product_id)
         except:
             return make_response(
-                jsonify({"message": 
+                jsonify({"message":
                         "The product id in the url must be an integer"}), 401
             )
         if not products:
@@ -188,22 +190,30 @@ class SpecificProduct(Resource, FetchDatabase):
 class Sales(Resource, FetchDatabase):
     @token_auth
     def get(current_user, self):
-        return jsonify(self.db.fetch_sales())
-        data = current_user.view_sales()
+        sales = self.db.fetch_sales()
+        data = []
+        for sale in sales:
+            if sale["owner"] == current_user.get_username():
+                data.append(sale)        
+        if not sales:
+            return make_response(
+                jsonify({"message": "no sale available"}), 404
+            )
+        if current_user.get_admin_status():
+            return make_response(jsonify(sales), 200)
         if not data:
             return make_response(
-                jsonify({"message": "no sales available"}), 404
+                jsonify({"message": "you dont have any sale"}), 404
             )
-        return make_response(
-            jsonify(data), 200
-        )
-        return jsonify(self.db.fetch_sales())
+        if current_user.get_admin_status():
+            return make_response(jsonify(sales), 200)
+        return make_response(jsonify(data), 200)
 
     @token_auth
     def post(current_user, self):
         data = request.get_json()
         ddata = {}
-        if current_user.get_admin_status:
+        if current_user.get_admin_status():
             return make_response(
                 jsonify({"message": "only a store attendant can post a sale"}), 401
             )
