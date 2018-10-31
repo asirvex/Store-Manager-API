@@ -27,7 +27,7 @@ def token_auth(func):
             )
         current_user = None
         try:
-            token_data = jwt.decode(token, Config.secret_key)
+            token_data = jwt.decode(token, Config.secret_key, algorithms=["HS256"])
         except:
             return make_response(
                 jsonify({"message": "invalid token"}), 401
@@ -331,5 +331,5 @@ class SignUp(Resource, FetchDatabase):
             user_id, username, first_name, second_name, password
             )
         return make_response(
-            jsonify({"message": "user added succesfully"}), 201
+            jsonify({"message": "user added successfully"}), 201
         )

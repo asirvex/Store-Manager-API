@@ -172,8 +172,12 @@ def destroy_tables():
     connection = psycopg2.connect(os.getenv("DATABASE_TESTING_URL"))
     cursor = connection.cursor()
     try:
-        cursor.execute("""DROP TABLE users;""")
-        cursor.execute("""DROP TABLE products;""")
-        cursor.execute("""DROP TABLE IF EXISTS sales;""")
-    except:
-        print("Tables destroyed")
+        cursor.execute("""DROP TABLE product_sales CASCADE;""")
+        cursor.execute("""DROP TABLE products CASCADE;""")
+        cursor.execute("""DROP TABLE sales CASCADE;""")
+        cursor.execute("""DROP TABLE users CASCADE;""")
+        connection.commit()
+        print("tables destroyed")
+    except Exception as e:
+        print(e)
+        print("Tables not destroyed")

@@ -14,6 +14,7 @@ class Development(Config):
 class Testing(Config):
     """Configuration for testing environment"""
     DEBUG = False
+    
 
 class Production(Config):
     """Configuration for production environment"""
