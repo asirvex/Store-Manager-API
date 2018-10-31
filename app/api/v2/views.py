@@ -192,6 +192,7 @@ class SpecificProduct(Resource, FetchDatabase):
 class Sales(Resource, FetchDatabase):
     @token_auth
     def get(current_user, self):
+        return jsonify(self.db.fetch_sales())
         data = current_user.view_sales()
         if not data:
             return make_response(
@@ -200,6 +201,7 @@ class Sales(Resource, FetchDatabase):
         return make_response(
             jsonify(data), 200
         )
+        return jsonify(self.db.fetch_sales())
 
     @token_auth
     def post(current_user, self):
@@ -221,7 +223,12 @@ class Sales(Resource, FetchDatabase):
         ddata["date"] = str(date.today())
         ddata["total_price"] = total_price(data)
         ddata["sale_id"] = generate_saleid(sales)
-        subtract_quantity(data)
+        products = self.db.fetch_products()
+        for product in products:
+            for item in data:
+                if item["name"] == product["name"]:
+                    quantity = product["quantity"] - item["quantity"]
+                    self.db.update_quantity(product["name"], quantity)
         self.db.insert_sale(
             ddata["sale_id"], ddata["date"], current_user.get_username(),
             ddata["products_sold"], ddata["total_price"])
@@ -278,7 +285,7 @@ class Login(Resource, FetchDatabase):
                 )
         if not token:
             resp = make_response(
-                jsonify({"message": "could not log you in"}), 401
+                jsonify({"message": "Username or password is invalid. Login failed!"}), 401
             )
         return resp
 
