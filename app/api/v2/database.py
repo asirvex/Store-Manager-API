@@ -88,7 +88,7 @@ class Db():
         self.cursor.execute(
             """INSERT INTO users(employeeId, username, firstname, secondname, password, admin)
             VALUES(%s, %s, %s, %s, %s, %s)""",
-            (self.id, self.username, self.firstname, self.secondname, self.password, self.admin)
+            (id, self.username, self.firstname, self.secondname, self.password, self.admin)
         )
         self.connection.commit()
 
