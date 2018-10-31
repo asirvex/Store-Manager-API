@@ -109,7 +109,8 @@ class Product():
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "price": self.price
+            "price": self.price,
+            "quantity": self.quantity
             }
 
 

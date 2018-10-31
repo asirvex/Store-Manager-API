@@ -20,8 +20,6 @@ def exists(item_name, list_name):
 
 
 def validate_product_input(dictionary):
-    if "id" not in dictionary:
-        return False, "Data should contain an id field"
     if "name" not in dictionary:
         return False, "Data input should contain a name field"
     if "description" not in dictionary:
@@ -128,12 +126,12 @@ def generate_userid(store_attendants):
                 return generate_userid(store_attendants)
     return user_id
 
-def generate_saleid(sales):
+def generate_id(ls):
     sale_id=random.randint(1, 10000)
-    if sales:
-        for sale in sales:
-            if sale.get_id() == sale_id:
-                return generate_saleid(sales)
+    if ls:
+        for item in ls:
+            if item.get_id() == sale_id:
+                return generate_id(ls)
     return sale_id
 
 def verify_sign_up(data):
