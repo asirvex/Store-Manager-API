@@ -90,7 +90,7 @@ def product_exists(products_list):
             if item["name"] == product.get_name():
                 i += 1
     if i == len(products_list):
-        return True, "success" 
+        return True, "success"
     message = "The product in the order at position " +str(i+1) +" does not exist"
     return False, message
 

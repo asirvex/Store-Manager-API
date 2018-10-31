@@ -45,6 +45,7 @@ class Db():
             self.product_sales = """CREATE TABLE IF NOT EXISTS product_sales(
                 sale_id INT REFERENCES sales (id) ON UPDATE CASCADE ON DELETE CASCADE,
                 product_name TEXT REFERENCES products (name) ON UPDATE CASCADE,
+                price TEXT NOT NULL,
                 quantity INT NOT NULL
             );"""
             self.cursor.execute(self.product_sales)
@@ -62,15 +63,23 @@ class Db():
         for product in products:
             product_name = product["name"]
             quantity = product["quantity"]
+            price = product["price"]
             self.cursor.execute(
-                """INSERT INTO product_sales(sale_id, product_name, quantity)
-                VALUES(%s, %s, %s)""", (sale_id, product_name, quantity)
+                """INSERT INTO product_sales(sale_id, product_name, price, quantity)
+                VALUES(%s, %s, %s, %s)""", (sale_id, product_name, price, quantity)
             )
             self.connection.commit()
 
+    def update_quantity(self, product_name, quantity):
+        """Updates the quantity in the database"""
+        self.cursor.execute(
+            """UPDATE products SET quantity = %s where name = %s """, (
+                quantity, product_name)
+        )
+        self.connection.commit()
+
     def insert_user(self, id, username, firstname, secondname, password, admin):
         """inserts a user into the users table"""
-        self.id = id
         self.username = username
         self.firstname = firstname
         self.secondname = secondname
@@ -135,12 +144,21 @@ class Db():
         sales = []
         for row in rows:
             sale = {}
-            sale["id"] = row[0]
+            sale["sale_id"] = row[0]
             sale["date"] = row[1]
             sale["owner"] = row[2]
-            sale["products"] = row[3]
-            sale["total_price"] = row[4]
+            sale["total_price"] = row[3]
             sales.append(sale)
+        for sale in sales:
+            sale["products"] = []
+            self.cursor.execute("SELECT * from product_sales where sale_id = %s" % sale["sale_id"])
+            items = self.cursor.fetchall()
+            for item in items:
+                product = {}
+                product["product_name"] = item[1]
+                product["price"] = item[2]
+                product["quantity"] = item[3]
+                sale["products"].append(product)
         return sales
 
     def delete_product(self, product_id):
