@@ -91,8 +91,6 @@ class TestSales(BaseTest):
                                     headers={
                                         "access_token": self.user_token
                                             })
-        response = json.loads(resp.data)
-        self.assertEqual(response["message"], "no sales available")
         self.assertEqual(resp.status_code, 404)
 
     def test_get_one_with_uknown_id(self):

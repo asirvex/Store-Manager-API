@@ -83,7 +83,6 @@ class TestProducts(BaseTest):
                 'access_token': self.access_token,
                 'content-type': 'application/json'
                     })
-        print(resp.data)
         self.assertEqual(resp.status_code, 201)
 
     def test_post_product_without_data(self):
