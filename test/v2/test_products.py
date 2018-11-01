@@ -107,12 +107,12 @@ class TestProducts(BaseTest):
             )
         self.assertEqual(resp.status_code, 200)
 
-    # def test_getting_one_product(self):
-    #     resp = self.test_client.get("/api/v2/products/1",
-    #                                 headers={
-    #                                     "access_token": self.access_token
-    #                                         })
-    #     self.assertEqual(resp.status_code, 200)
+    def test_getting_one_product(self):
+        resp = self.test_client.get("/api/v2/products/100000",
+                                    headers={
+                                        "access_token": self.access_token
+                                            })
+        self.assertEqual(resp.status_code, 404)
 
     def test_post_with_wrong_product_keys(self):
         resp = self.test_client.post("/api/v2/products",

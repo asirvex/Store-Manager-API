@@ -63,7 +63,6 @@ class BaseTest(unittest.TestCase):
         
         self.product1 = json.dumps(
             {
-                "id": 1,
                 "name": "milk 500ml",
                 "description": "sweet fresh milk",
                 "price": 50,
@@ -71,7 +70,7 @@ class BaseTest(unittest.TestCase):
             })
 
         self.product2 = json.dumps(
-            {   "id": 3,
+            {
                 "name": "jacket",
                 "description": "brown leather jacket",
                 "price": 1200,
@@ -94,8 +93,7 @@ class BaseTest(unittest.TestCase):
         )
         self.test_client.post("/api/v2/products",
                               data=json.dumps(
-                                  { 
-                                    "id": 1,                                 
+                                  {                              
                                     "name": "milk 500ml",
                                     "description": "sweet fresh milk",
                                     "price": 50,
@@ -106,6 +104,7 @@ class BaseTest(unittest.TestCase):
                                     'content-type': 'application/json',
                                     'access_token': self.access_token
                                       })
+
         self.test_client.post("/api/v2/products", data=self.product2,
                               headers={
                                         'content-type': 'application/json',

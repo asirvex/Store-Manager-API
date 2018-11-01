@@ -7,10 +7,12 @@ from functools import wraps
 
 from .models import products, Product, StoreAttendant, store_attendants
 
+
 def password_validate(password):
     if len(password) < 6:
         return False, "Password should have more than 6 characters"
     return True, "success"
+
 
 def exists(item_name, list_name):
     """Check if a particular item already exists in the list"""
@@ -18,10 +20,11 @@ def exists(item_name, list_name):
         if item.get_name() == item_name:
             return True
 
+
 def validate_put_product(dict):
     if "name" not in dict and "description" not in dict and "quantity" not in dict and "price" not in dict:
         return False, "Input should contain atleast a name, description, quantity or price field"
-    
+
     for value in dict.values():
         if not value:
             message = "field contains an empty input"
@@ -43,7 +46,8 @@ def validate_put_product(dict):
     if "price" in dict:
         if type(dict["price"]) is not float:
             return False, "price input should be a float or integer"
-
+    if dict["price"] <= 1:
+        return False, "a products price cannot be zero or less than zero"
     return True, "success"
 
 
@@ -56,7 +60,7 @@ def validate_product_input(dictionary):
         return False, "Data input should contain a quantity field"
     if "price" not in dictionary:
         return False, "Data input should contain a price field"
-    
+
     for value in dictionary.values():
         if not value:
             message = "field contains an empty input"
@@ -78,19 +82,25 @@ def validate_product_input(dictionary):
     if type(dictionary["price"]) is not float:
         return False, "price input should be a float or integer"
 
+    if dictionary["price"] <= 0:
+        return False, "a products price cannot be zero or less than zero"
+
     return True, "success"
 
 
 def validate_sales_input(products_list):
     if type(products_list) is not list:
-        message = "The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys "
+        message = """The sales input should a list of dictionaries
+         which contains name and quantity keys"""
         return False, message
     if not products_list:
-        message = "Empty input, The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys"
+        message = """Empty input, The sales input should a list of
+        dictionaries which contains 'name' 'quantity' and 'price' keys"""
         return False, message
     for product in products_list:
-        if "name" not in product or "quantity" not in product or "price" not in product:
-            message = "The sales input should a list of dictionaries which contains 'name' 'quantity' and 'price' keys 3 " + str(product["name"])
+        if "name" not in product or "quantity" not in product:
+            message = """The sales input should be a list of dictionaries which
+            contains name, and quantity keys"""
             return False, message
     for value in product.values():
         if not value:
@@ -98,12 +108,13 @@ def validate_sales_input(products_list):
             return False, message
     try:
         product["price"] = float(product["price"])
-    except: 
+    except:
         pass
-    if type(product["name"]) is not str or type(product["quantity"]) is not int or type(product["price"]) is not float:
-        message = "incorrect data types, data types should be: 'name' - string, quantity - int, 'price' - float"
+    if type(product["name"]) is not str or type(product["quantity"]) \
+            is not int:
+        message = "incorrect data types, data types should be: \
+        name - string and quantity - int"
         return False, message
-    
     return True, "Success"
 
 
@@ -115,8 +126,10 @@ def product_exists(products_list):
                 i += 1
     if i == len(products_list):
         return True, "success"
-    message = "The product in the order at position " +str(i+1) +" does not exist"
+    product
+    message = products_list[i]
     return False, message
+
 
 def right_quantity(products_list):
     i = 0
@@ -128,37 +141,40 @@ def right_quantity(products_list):
                     i += 1
     if i == len(products_list):
         return True, "success"
-    message = "The quantity is not enough to make order at position " + str(i+1) + " "
-    return False, message
-                                            
+    return False, products_list[i]
+
+
 def total_price(products_list):
     total = 0
     for product in products_list:
         total = total + (product["price"] * product["quantity"])
     return total
 
+
 def subtract_quantity(products_list):
     for item in products_list:
         for product in products:
             if item["name"] == product.get_name():
                 product.quantity = product.get_quantity() - item["quantity"]
-    
-     
+
+
 def generate_userid(store_attendants):
-    user_id=random.randint(1, 1000)
+    user_id = random.randint(1, 1000)
     if store_attendants:
         for a_user in store_attendants:
             if a_user.get_employee_id()==user_id:
                 return generate_userid(store_attendants)
     return user_id
 
+
 def generate_id(ls):
-    sale_id=random.randint(1, 10000)
+    sale_id = random.randint(1, 10000)
     if ls:
         for item in ls:
             if item.get_id() == sale_id:
                 return generate_id(ls)
     return sale_id
+
 
 def verify_sign_up(data):
     if "username" not in data:
@@ -169,19 +185,19 @@ def verify_sign_up(data):
         return False, "The input should contain second_name"
     if "password" not in data:
         return False, "The input should contain password"
-    
+
     if not data["username"]:
         return False, "The username cant be empty"
 
     if not data["first_name"]:
         return False, "The first_name cant be empty"
-    
+
     if not data["second_name"]:
         return False, "The second_name cant be empty"
 
     if not data["password"]:
         return False, "The password cant be empty"
-    
+
     return True, "success"
 
 

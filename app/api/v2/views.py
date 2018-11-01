@@ -15,6 +15,7 @@ from .utils import (product_exists, right_quantity, subtract_quantity,
                     password_validate, generate_id, validate_put_product)
 from .database import Db
 
+
 def token_auth(func):
     @wraps(func)
     def decorated(*args, **kwags):
@@ -27,7 +28,8 @@ def token_auth(func):
             )
         current_user = None
         try:
-            token_data = jwt.decode(token, Config.secret_key, algorithms=["HS256"])
+            token_data = jwt.decode(
+                token, Config.secret_key, algorithms=["HS256"])
         except:
             return make_response(
                 jsonify({"message": "invalid token"}), 401
@@ -42,7 +44,9 @@ def token_auth(func):
         return func(current_user, *args, **kwags)
     return decorated
 
-admin = Admin(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
+admin = Admin(
+    1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
+
 
 class FetchDatabase():
     def __init__(self):
@@ -76,7 +80,7 @@ class Products(Resource, FetchDatabase):
                 jsonify({"message": "only the admin can add a product"}), 401
             )
         data = request.get_json()
-        if not validate_product_input(data)[0]: 
+        if not validate_product_input(data)[0]:
             return make_response(
                 jsonify({"message": validate_product_input(data)[1]}), 400
             )
@@ -156,8 +160,9 @@ class SpecificProduct(Resource, FetchDatabase):
                     data["quantity"] = product.get_quantity()
                 if "price" not in data:
                     data["price"] = product.get_price()
-                self.db.update_product(product_id, data["name"], data["description"], data["quantity"], data["price"])
-
+                self.db.update_product(
+                    product_id, data["name"], data["description"],
+                    data["quantity"], data["price"])
         return make_response(
             jsonify({"message": "product updated successfully",
                     "product": data}), 201
@@ -218,7 +223,9 @@ class Sales(Resource, FetchDatabase):
         ddata = {}
         if current_user.get_admin_status():
             return make_response(
-                jsonify({"message": "only a store attendant can post a sale"}), 401
+                jsonify({
+                    "message": "only a store attendant can post a sale"
+                    }), 401
             )
         if not validate_sales_input(data)[0]:
             return make_response(
@@ -226,12 +233,20 @@ class Sales(Resource, FetchDatabase):
                 )
         if not product_exists(data)[0]:
             return make_response(
-                jsonify({"message": product_exists(data)[1]}), 400
+                jsonify({"message": "the sale cannot be made because the \
+                         following product doesnt exist",
+                        "product": product_exists(data)[1]}), 400
             )
         if not right_quantity(data)[0]:
             return make_response(
-                jsonify({"message": right_quantity(data)[1]}), 400
+                jsonify({"message": """the quantity is not enough to make
+                 the sale""", "product": right_quantity(data)[1]}), 400
             )
+        products = self.db.fetch_products()
+        for product in products:
+            for item in data:
+                if product["name"] == item["name"]:
+                    item["price"] = product["price"]
         ddata["products_sold"] = data
         ddata["date"] = str(date.today())
         ddata["total_price"] = total_price(data)
@@ -293,11 +308,15 @@ class Login(Resource, FetchDatabase):
                         "username": user.get_username(), "exp": exp
                     }, os.getenv("SECRET_KEY"))
                 resp = make_response(
-                    jsonify({"token": token.decode("UTF-8")}), 201
+                    jsonify({
+                        "message": "login successful",
+                        "token": token.decode("UTF-8")}), 201
                 )
         if not token:
             resp = make_response(
-                jsonify({"message": "Username or password is invalid. Login failed!"}), 401
+                jsonify({
+                    "message": "Username or password is invalid. Login failed!"
+                    }), 401
             )
         return resp
 
@@ -335,3 +354,43 @@ class SignUp(Resource, FetchDatabase):
         return make_response(
             jsonify({"message": "user added successfully"}), 201
         )
+
+
+class Promote(Resource, FetchDatabase):
+    @token_auth
+    def post(current_user, self):
+        if not current_user.get_admin_status():
+            return make_response(
+                jsonify({"message": "only the admin can promote a user"}), 401
+            )
+        data = request.get_json()
+        if "username" not in data:
+            return make_response(
+                jsonify({"message": "your input should contain the username"}),
+                400)
+        if type(data["username"]) != str:
+            return make_response(
+                jsonify({"message": "the username should be a string"})
+            )
+        username = data["username"].strip().lower()
+        for user in store_attendants:
+            if user.get_username() == username:
+                if user.get_admin_status():
+                    return make_response(
+                        jsonify({"message": "user already an admin"}), 400
+                    )
+                self.db.promote_user(username)
+                theuser = {}
+                theuser["username"] = user.get_username()
+                theuser["first_name"] = user.get_first_name()
+                theuser["second_name"] = user.get_second_name()
+                return make_response(
+                    jsonify({"message": "user promoted to admin",
+                            "user": theuser}), 201
+                )
+        return make_response(
+            jsonify({
+                "message": "You cannot promote a user who isnt registered"
+                }), 400
+        )
+        
