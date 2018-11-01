@@ -9,6 +9,9 @@ class Db():
             self.db_url = os.getenv("DATABASE_URL")
         if os.getenv("APP_SETTINGS") == "testing":
             self.db_url = os.getenv("DATABASE_TESTING_URL")
+            except Exception:
+                self.conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode = 'require')
+
         self.connection = psycopg2.connect(self.db_url)
         self.cursor = self.connection.cursor()
 
