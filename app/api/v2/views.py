@@ -260,19 +260,18 @@ class SpecificSale(Resource, FetchDatabase):
                 jsonify({"message": "The sale id \
                          in the url must be an integer"}), 401
             )
-        data = current_user.view_sales()
-        if not data:
+        sale = self.db.fetch_one_sale(sale_id)
+        if not sale:
             return make_response(
-                jsonify({"message": "no sales available"}), 404
-            )
-        for sale in data:
-            if sale["sale_id"] == sale_id:
+                jsonify({"message": "There is no sale with that sake id"}), 404
+                )
+        if current_user.get_admin_status() or current_user.get_username() == sale["owner"]:
                 return make_response(
                     jsonify(sale), 200
                 )
         return make_response(
-            jsonify({"message": "you dont have a sale with that id"}), 404
-        )
+            jsonify({"message": "You cannot view this sale"}), 403
+        )            
 
 
 class Login(Resource, FetchDatabase):
