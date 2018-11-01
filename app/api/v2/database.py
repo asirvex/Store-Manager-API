@@ -168,6 +168,29 @@ class Db():
                 product["quantity"] = item[3]
                 sale["products"].append(product)
         return sales
+    
+    def fetch_one_sale(self, sale_id):
+        """fetchs one sale"""
+        self.cursor.execute("SELECT * from sales where id = %s" % (sale_id))
+        rows = self.cursor.fetchall()
+        if not rows:
+            return rows
+        sale = {}
+        for row in rows:
+            sale["sale_id"] = row[0]
+            sale["date"] = row[1]
+            sale["owner"] = row[2]
+            sale["total_price"] = row[3]
+        sale["products"] = []
+        self.cursor.execute("SELECT * from product_sales where sale_id = %s" % sale["sale_id"])
+        items = self.cursor.fetchall()
+        for item in items:
+            product = {}
+            product["product_name"] = item[1]
+            product["price"] = item[2]
+            product["quantity"] = item[3]
+            sale["products"].append(product)
+        return sale
 
     def delete_product(self, product_id):
         """deletes a product entry from the databasae"""
