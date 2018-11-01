@@ -10,7 +10,7 @@ before_script:
  - psql -c "CREATE DATABASE test;" -U postgres
  - export SECRET_KEY="secret"
  - export APP_SETTINGS="testing"
- - export DATABASE_TESTING_URL=test
+ - export DATABASE_TESTING_URL="dbname=test"
 
 script:
  - nosetests
