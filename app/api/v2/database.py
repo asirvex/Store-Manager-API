@@ -66,7 +66,8 @@ class Db():
             price = product["price"]
             self.cursor.execute(
                 """INSERT INTO product_sales(sale_id, product_name, price, quantity)
-                VALUES(%s, %s, %s, %s)""", (sale_id, product_name, price, quantity)
+                VALUES(%s, %s, %s, %s)""",
+                (sale_id, product_name, price, quantity)
             )
             self.connection.commit()
 
@@ -81,7 +82,8 @@ class Db():
     def update_product(self, id, name, description, quantity, price):
         """Updates a product in the database"""
         self.cursor.execute(
-            """UPDATE products SET name = %s , description = %s , quantity = %s , price = %s WHERE id = %s """,
+            """UPDATE products SET name = %s , description = %s ,
+            quantity = %s , price = %s WHERE id = %s """,
             (name, description, quantity, price, id)
         )
         self.connection.commit()
@@ -94,9 +96,19 @@ class Db():
         self.password = password
         self.admin = admin
         self.cursor.execute(
-            """INSERT INTO users(employeeId, username, firstname, secondname, password, admin)
+            """INSERT INTO users(employeeId, username,
+            firstname, secondname, password, admin)
             VALUES(%s, %s, %s, %s, %s, %s)""",
-            (id, self.username, self.firstname, self.secondname, self.password, self.admin)
+            (id, self.username, self.firstname, self.secondname,
+                self.password, self.admin)
+        )
+        self.connection.commit()
+
+    def promote_user(self, username):
+        """Changes user admin status from false to true"""
+        self.cursor.execute(
+            """UPDATE users SET admin = %s where username = %s""",
+            (True, username)
         )
         self.connection.commit()
 
@@ -110,7 +122,8 @@ class Db():
         self.cursor.execute(
             """INSERT INTO products(id, name, description, quantity, price)
             VALUES(%s, %s, %s, %s, %s)""",
-            (self.product_id, self.name, self.description, self.quantity, self.price)
+            (self.product_id, self.name,
+                self.description, self.quantity, self.price)
         )
         self.connection.commit()
 
@@ -159,7 +172,8 @@ class Db():
             sales.append(sale)
         for sale in sales:
             sale["products"] = []
-            self.cursor.execute("SELECT * from product_sales where sale_id = %s" % sale["sale_id"])
+            self.cursor.execute("SELECT * from product_sales where \
+                                 sale_id = %s" % sale["sale_id"])
             items = self.cursor.fetchall()
             for item in items:
                 product = {}
