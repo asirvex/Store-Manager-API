@@ -55,7 +55,6 @@ class BaseTest(unittest.TestCase):
             data=self.attendant_login_details,
             headers={
                 'content-type': 'application/json',
-                "access_token": self.access_token
             })
 
         self.user_token = json.loads(

@@ -32,7 +32,7 @@ class TestUsers(BaseTest):
         self.assertEqual(response["message"], "user added successfully")
         self.assertEqual(resp.status_code, 201)
 
-    def test_sign_up_admin_with_empty_parameters(self):
+    def test_sign_up_admin_with_empty_first_name(self):
         resp = self.test_client.post(
             "/api/v2/auth/signup",
             data=json.dumps({"username": "brandon",
@@ -40,9 +40,28 @@ class TestUsers(BaseTest):
                              "second_name": "",
                              "password": "sfowskv"}),
             headers={
-                'content-type': 'application/json'
+                'content-type': 'application/json',
+                "access_token": self.access_token
                 }
             )
+        response = json.loads(resp.data)
+        self.assertEqual(response["message"], "The first_name cant be empty")
+        self.assertEqual(resp.status_code, 400)
+
+    def test_sign_up_admin_with_empty_first_name(self):
+        resp = self.test_client.post(
+            "/api/v2/auth/signup",
+            data=json.dumps({"username": "brandon",
+                             "first_name": "br",
+                             "second_name": "",
+                             "password": "sfowskv"}),
+            headers={
+                'content-type': 'application/json',
+                "access_token": self.access_token
+                }
+            )
+        response = json.loads(resp.data)
+        self.assertEqual(response["message"], "The second_name cant be empty")
         self.assertEqual(resp.status_code, 400)
 
     def test_sign_up_without_all_parameters(self):
@@ -55,16 +74,25 @@ class TestUsers(BaseTest):
                 }
             ),
             headers={
-                "content-type": "application/json"
+                "content-type": "application/json",
+                "access_token": self.access_token
             }
         )
+        response = json.loads(resp.data)
+        self.assertEqual(response["message"], "The input should contain first_name")
         self.assertEqual(resp.status_code, 400)
 
     def test_login_with_no_credentials_given(self):
         resp = self.test_client.post("/api/v2/auth/login",
+                            data=json.dumps({
+                                "username": "",
+                                "password": ""
+                                }),
                             headers={
                                     'content-type': 'application/json'
                                 })
+        response = json.loads(resp.data)
+        self.assertEqual(response["message"], "Atleast one field contains an empty input")
         self.assertEqual(resp.status_code, 400)
 
     def test_login_with_wrong_password(self):
@@ -77,6 +105,8 @@ class TestUsers(BaseTest):
             headers={
                 "content-type": "application/json"
             })
+        response = json.loads(resp.data)
+        self.assertEqual(response["message"], "Username or password is invalid. Login failed!")
         self.assertEqual(resp.status_code, 401)
 
     def test_login_without_an_account(self):
@@ -89,6 +119,8 @@ class TestUsers(BaseTest):
             headers={
                 "content-type": "application/json"
             })
+        response = json.loads(resp.data)
+        self.assertEqual(response["message"], "Username or password is invalid. Login failed!")
         self.assertEqual(resp.status_code, 401)
 
     def test_login_with_unregistered(self):
@@ -104,14 +136,17 @@ class TestUsers(BaseTest):
 
     def test_sign_up_short_password(self):
         resp = self.test_client.post(
-            "/api/v2/auth/login",
+            "/api/v2/auth/signup",
             data=json.dumps({
-                "name": "testsu",
+                "username": "testsu",
                 "first_name": "test",
                 "second_name": "signup",
                 "password": "pwd"
             }),
             headers={
-                "content-type": "application/json"
+                "content-type": "application/json",
+                "access_token": self.access_token
             })
+        response = json.loads(resp.data)
+        self.assertEqual(response["message"], "Password should have more than 6 characters")
         self.assertEqual(resp.status_code, 400)

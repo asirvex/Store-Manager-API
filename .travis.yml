@@ -2,10 +2,15 @@ language: python
 python:
  - "3.6"
 cache: pip
+services:
+  - postgresql
 install:
  - pip install -r requirements.txt
 before_script:
+ - psql -c "CREATE DATABASE test;" -U postgres
  - export SECRET_KEY="secret"
+ - export APP_SETTINGS="testing"
+ - export DATABASE_TESTING_URL=test
 
 script:
  - nosetests

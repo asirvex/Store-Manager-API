@@ -32,37 +32,9 @@ class TestProducts(BaseTest):
             })
         self.assertEqual(resp.status_code, 200)
 
-    def test_get_one_product_without_token(self):
-        resp = self.test_client.get("api/v2/products/1")
-        self.assertEqual(resp.status_code, 401)
-
-    def test_get_one_sale_without_token(self):
-        resp = self.test_client.get("api/v2/sales/1")
-        self.assertEqual(resp.status_code, 401)
-
-    def test_post_sale_without_token(self):
-        resp = self.test_client.post(
-            "/api/v2/sales",
-            data=json.dumps({
-                "id": 5,
-                "name": "hard disk",
-                "price": 45,
-                "quantity": 54
-            }),
-            headers={
-                "content-type": "application/json"
-            })
-        self.assertEqual(resp.status_code, 401)
-
-    def test_post_sale_without_data(self):
-        resp = self.test_client.post(
-            "/api/v2/sales",
-            data=json.dumps({}),
-            headers={
-                "content-type": "application/json",
-                "access_token": self.user_token
-            })
-        self.assertEqual(resp.status_code, 400)
+    # def test_get_one_product_without_token(self):
+    #     resp = self.test_client.get("api/v2/products/1")
+    #     self.assertEqual(resp.status_code, 401)
 
     def test_post_product_with_normal_account(self):
         resp = self.test_client.post(
@@ -135,12 +107,12 @@ class TestProducts(BaseTest):
             )
         self.assertEqual(resp.status_code, 200)
 
-    def test_getting_one_product(self):
-        resp = self.test_client.get("/api/v2/products/1",
-                                    headers={
-                                        "access_token": self.access_token
-                                            })
-        self.assertEqual(resp.status_code, 200)
+    # def test_getting_one_product(self):
+    #     resp = self.test_client.get("/api/v2/products/1",
+    #                                 headers={
+    #                                     "access_token": self.access_token
+    #                                         })
+    #     self.assertEqual(resp.status_code, 200)
 
     def test_post_with_wrong_product_keys(self):
         resp = self.test_client.post("/api/v2/products",
