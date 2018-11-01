@@ -29,8 +29,6 @@ class BaseTest(unittest.TestCase):
                                              'content-type': 'application/json'
                                             })
         self.access_token = json.loads(admin_login.data.decode())["token"]
-        print("HERER")
-        print(json.loads(admin_login.data.decode()))
 
         self.attendant = json.dumps({
                         "username": "sharon",
