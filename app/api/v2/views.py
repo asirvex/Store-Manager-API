@@ -12,7 +12,7 @@ from .models import sales, Sale, FetchData
 from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
                     total_price, verify_sign_up, generate_userid, verify_login,
-                    password_validate, generate_id)
+                    password_validate, generate_id, validate_put_product)
 from .database import Db
 
 def token_auth(func):
@@ -27,7 +27,7 @@ def token_auth(func):
             )
         current_user = None
         try:
-            token_data = jwt.decode(token, Config.secret_key)
+            token_data = jwt.decode(token, Config.secret_key, algorithms=["HS256"])
         except:
             return make_response(
                 jsonify({"message": "invalid token"}), 401
@@ -111,7 +111,6 @@ class SpecificProduct(Resource, FetchDatabase):
             return make_response(
                 jsonify({"message": "no product found"}), 404
                 )
-        product_id = int(product_id)
         data = {}
         for product in products:
             if product.get_id() == product_id:
@@ -141,25 +140,29 @@ class SpecificProduct(Resource, FetchDatabase):
                 jsonify({"message": "only the admin can edit a product"}), 401
             )
         data = request.get_json()
-        if not validate_product_input(data)[0]:
+        if not data:
+            return jsonify({"message": "Please input something"})
+        if not validate_put_product(data)[0]:
             return make_response(
-                jsonify({"message": validate_product_input(data)[1]}), 400
+                jsonify({"message": validate_put_product(data)[1]}), 400
                 )
-        if exists(data["name"], products):
-            return make_response(
-                jsonify({"message": "another product with \
-                        the same name already exists"}), 400
-            )
         for product in products:
             if product.get_id() == product_id:
-                product.name = data["name"]
-                product.description = data["description"]
-                product.price = data["price"]
-                product.quantity = data["quantity"]
-                return make_response(
-                    jsonify({"message": "Product details updated",
-                             "product": product.get_all_attributes()})
-                )
+                if "name" not in data:
+                    data["name"] = product.get_name()
+                if "description" not in data:
+                    data["description"] = product.get_description()
+                if "quantity" not in data:
+                    data["quantity"] = product.get_quantity()
+                if "price" not in data:
+                    data["price"] = product.get_price()
+                self.db.update_product(product_id, data["name"], data["description"], data["quantity"], data["price"])
+
+        return make_response(
+            jsonify({"message": "product updated successfully",
+                    "product": data}), 201
+            )
+
     @token_auth
     def delete(current_user, self, product_id):
         try:
@@ -173,13 +176,13 @@ class SpecificProduct(Resource, FetchDatabase):
             return make_response(
                 jsonify({"message": "only the admin can delete products"}), 401
             )
-        
+
         for product in products:
             if product.get_id() == product_id:
                 self.db.delete_product(product_id)
                 return make_response(
                     jsonify({"message": "product deleted successfully",
-                             "product": product.get_all_attributes()})
+                             "product": product.get_all_attributes()}), 202
                 )
         return make_response(
             jsonify({"message":
@@ -254,7 +257,7 @@ class SpecificSale(Resource, FetchDatabase):
             sale_id = int(sale_id)
         except:
             return make_response(
-                jsonify({"message": "The product id \
+                jsonify({"message": "The sale id \
                          in the url must be an integer"}), 401
             )
         data = current_user.view_sales()
@@ -282,7 +285,7 @@ class Login(Resource, FetchDatabase):
         username = data["username"].strip().lower()
         password = data["password"]
         token = None
-        exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+        exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=20)
         for user in store_attendants:
             if username == user.get_username() \
               and check_password_hash(user.get_password(), password):
@@ -331,5 +334,5 @@ class SignUp(Resource, FetchDatabase):
             user_id, username, first_name, second_name, password
             )
         return make_response(
-            jsonify({"message": "user added succesfully"}), 201
+            jsonify({"message": "user added successfully"}), 201
         )

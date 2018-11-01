@@ -18,6 +18,34 @@ def exists(item_name, list_name):
         if item.get_name() == item_name:
             return True
 
+def validate_put_product(dict):
+    if "name" not in dict and "description" not in dict and "quantity" not in dict and "price" not in dict:
+        return False, "Input should contain atleast a name, description, quantity or price field"
+    
+    for value in dict.values():
+        if not value:
+            message = "field contains an empty input"
+            return False, message
+    try:
+        dict["price"] = float(dict["price"])
+    except:
+        pass
+
+    if "name" in dict:
+        if type(dict["name"]) is not str:
+            return False, "name input should be a string" 
+    if "description" in dict:
+        if type(dict["description"]) is not str:
+            return False, "description input should be a string"
+    if "quantity" in dict:
+        if type(dict["quantity"]) is not int:
+            return False, "quantity input should be a string"
+    if "price" in dict:
+        if type(dict["price"]) is not float:
+            return False, "price input should be a float or integer"
+
+    return True, "success"
+
 
 def validate_product_input(dictionary):
     if "name" not in dictionary:
@@ -31,14 +59,12 @@ def validate_product_input(dictionary):
     
     for value in dictionary.values():
         if not value:
-            message = "field  contains an empty input"
+            message = "field contains an empty input"
             return False, message
     try:
         dictionary["price"] = float(dictionary["price"])
     except:
         pass
-    if type(dictionary["id"]) is not int:
-        return False, "id input should be an integer"
 
     if type(dictionary["name"]) is not str:
         return False, "name input should be a string" 
@@ -135,13 +161,27 @@ def generate_id(ls):
     return sale_id
 
 def verify_sign_up(data):
-    if "username" not in data or "first_name" not in data or "second_name" not in data or "password" not in data:
-        message = "Data input should contain 'username', 'first_name', 'second_name' and 'password' fields"
-        return False, message
-    for value in data.values():
-        if not value:
-            message = "Atleast one field contains an empty input"
-            return False, message
+    if "username" not in data:
+        return False, "The input should contain a username"
+    if "first_name" not in data:
+        return False, "The input should contain first_name"
+    if "second_name" not in data:
+        return False, "The input should contain second_name"
+    if "password" not in data:
+        return False, "The input should contain password"
+    
+    if not data["username"]:
+        return False, "The username cant be empty"
+
+    if not data["first_name"]:
+        return False, "The first_name cant be empty"
+    
+    if not data["second_name"]:
+        return False, "The second_name cant be empty"
+
+    if not data["password"]:
+        return False, "The password cant be empty"
+    
     return True, "success"
 
 

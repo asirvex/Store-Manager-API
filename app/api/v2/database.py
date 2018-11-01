@@ -78,6 +78,14 @@ class Db():
         )
         self.connection.commit()
 
+    def update_product(self, id, name, description, quantity, price):
+        """Updates a product in the database"""
+        self.cursor.execute(
+            """UPDATE products SET name = %s , description = %s , quantity = %s , price = %s WHERE id = %s """,
+            (name, description, quantity, price, id)
+        )
+        self.connection.commit()
+
     def insert_user(self, id, username, firstname, secondname, password, admin):
         """inserts a user into the users table"""
         self.username = username
@@ -172,8 +180,12 @@ def destroy_tables():
     connection = psycopg2.connect(os.getenv("DATABASE_TESTING_URL"))
     cursor = connection.cursor()
     try:
-        cursor.execute("""DROP TABLE users;""")
-        cursor.execute("""DROP TABLE products;""")
-        cursor.execute("""DROP TABLE IF EXISTS sales;""")
-    except:
-        print("Tables destroyed")
+        cursor.execute("""DROP TABLE product_sales CASCADE;""")
+        cursor.execute("""DROP TABLE products CASCADE;""")
+        cursor.execute("""DROP TABLE sales CASCADE;""")
+        cursor.execute("""DROP TABLE users CASCADE;""")
+        connection.commit()
+        print("tables destroyed")
+    except Exception as e:
+        print(e)
+        print("Tables not destroyed")

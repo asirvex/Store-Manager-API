@@ -56,7 +56,6 @@ class TestApi(unittest.TestCase):
         self.user_token = json.loads(
             self.login_attendant.data.decode()
             )["token"]
-        
         self.product1 = json.dumps(
             {
                 "name": "milk 500ml",
