@@ -10,7 +10,7 @@ from app.api.v2.database import destroy_tables
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        self.app = create_app(config_name="testing")
+        self.app = create_app("testing")
         self.test_client = self.app.test_client()
         self.admin_user = json.dumps({
                         "username": admin.get_username(),

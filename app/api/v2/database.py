@@ -5,7 +5,7 @@ import os
 class Db():
     """creates a connection and a cursor to manipulate the database"""
     def __init__(self):
-        try: 
+        try:
             if os.getenv("APP_SETTINGS") == "development":
                 self.db_url = os.getenv("DATABASE_URL")
             if os.getenv("APP_SETTINGS") == "testing":
