@@ -12,7 +12,8 @@ from .models import sales, Sale, FetchData
 from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
                     total_price, verify_sign_up, generate_userid, verify_login,
-                    password_validate, generate_id, validate_put_product)
+                    password_validate, generate_id, validate_put_product, 
+                    assign_put)
 from .database import Db
 
 
@@ -117,19 +118,10 @@ class SpecificProduct(Resource, FetchDatabase):
             return {"message": "Please input something"}, 401
         if not validate_put_product(data)[0]:
             return {"message": validate_put_product(data)[1]}, 400
-        for product in products:
-            if product.get_id() == product_id:
-                if "name" not in data:
-                    data["name"] = product.get_name()
-                if "description" not in data:
-                    data["description"] = product.get_description()
-                if "quantity" not in data:
-                    data["quantity"] = product.get_quantity()
-                if "price" not in data:
-                    data["price"] = product.get_price()
-                self.db.update_product(
-                    product_id, data["name"], data["description"],
-                    data["quantity"], data["price"])
+        data = assign_put(product_id)
+        self.db.update_product(
+            product_id, data["name"], data["description"],
+            data["quantity"], data["price"])
         return {"message": "product updated successfully",
                 "product": data}, 201
 

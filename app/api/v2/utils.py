@@ -46,8 +46,6 @@ def validate_put_product(dict):
     if "price" in dict:
         if type(dict["price"]) is not float:
             return False, "price input should be a float or integer"
-    if dict["price"] <= 1:
-        return False, "a products price cannot be zero or less than zero"
     return True, "success"
 
 
@@ -117,6 +115,20 @@ def validate_sales_input(products_list):
         return False, message
     return True, "Success"
 
+
+def assign_put(product_id):
+    data = {}
+    for product in products:
+        if product.get_id() == product_id:
+            if "name" not in data:
+                data["name"] = product.get_name()
+            if "description" not in data:
+                data["description"] = product.get_description()
+            if "quantity" not in data:
+                data["quantity"] = product.get_quantity()
+            if "price" not in data:
+                data["price"] = product.get_price()
+    return data
 
 def product_exists(products_list):
     i=0
