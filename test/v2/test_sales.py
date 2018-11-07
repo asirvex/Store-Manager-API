@@ -24,7 +24,7 @@ class TestSales(BaseTest):
         response = json.loads(resp.data)
         self.assertEqual(
             response["message"],
-            """the quantity is not enough to make\n                 the sale""")
+            """the quantity is not enough to make\n                    the sale""")
         self.assertEqual(resp.status_code, 400)
 
     def test_post_sale_with_right_quantity(self):
