@@ -102,7 +102,7 @@ def validate_sales_input(products_list):
             return False, message
     for value in product.values():
         if not value:
-            message = "Atleast one field contains an empty input"
+            message = "Empty input"
             return False, message
     try:
         product["price"] = float(product["price"])
@@ -219,6 +219,6 @@ def verify_login(data):
         return False, message
     for value in data.values():
         if not value:
-            message = "Atleast one field contains an empty input"
+            message = "Empty input"
             return False, message
     return True, "success"
