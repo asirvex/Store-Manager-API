@@ -23,6 +23,7 @@ class Db():
                 id INT PRIMARY KEY NOT NULL,
                 name TEXT NOT NULL UNIQUE,
                 description TEXT NOT NULL,
+                category TEXT,
                 quantity INT NOT NULL,
                 price REAL NOT NULL
             );"""
@@ -90,12 +91,12 @@ class Db():
         )
         self.connection.commit()
 
-    def update_product(self, id, name, description, quantity, price):
+    def update_product(self, id, name, description, category, quantity, price):
         """Updates a product in the database"""
         self.cursor.execute(
             """UPDATE products SET name = %s , description = %s ,
-            quantity = %s , price = %s WHERE id = %s """,
-            (name, description, quantity, price, id)
+            category = %s , quantity = %s , price = %s WHERE id = %s """,
+            (name, description, category, quantity, price, id)
         )
         self.connection.commit()
 
@@ -123,18 +124,19 @@ class Db():
         )
         self.connection.commit()
 
-    def insert_product(self, product_id, name, description, quantity, price):
+    def insert_product(self, product_id, name, description, category, quantity, price):
         """inserts a product into the database"""
         self.product_id = product_id
         self.name = name
         self.description = description
+        self.category = category
         self.quantity = quantity
         self.price = price
         self.cursor.execute(
-            """INSERT INTO products(id, name, description, quantity, price)
-            VALUES(%s, %s, %s, %s, %s)""",
-            (self.product_id, self.name,
-                self.description, self.quantity, self.price)
+            """INSERT INTO products(id, name, description, category, quantity, price)
+            VALUES(%s, %s, %s, %s, %s, %s)""",
+            (self.product_id, self.name, self.description,
+            self.category, self.quantity, self.price)
         )
         self.connection.commit()
 
@@ -176,8 +178,9 @@ class Db():
             product["id"] = row[0]
             product["name"] = row[1]
             product["description"] = row[2]
-            product["quantity"] = row[3]
-            product["price"] = row[4]
+            product["category"] = row[3]
+            product["quantity"] = row[4]
+            product["price"] = row[5]
             products.append(product)
         return products
 

@@ -76,12 +76,13 @@ class Products(Resource, FetchDatabase):
             return {"message": validate_product_input(data)[1]}, 400
         data["name"] = data["name"].strip().lower()
         data["description"] = data["description"].strip().lower()
+        data["category"] = data["category"].strip().lower()
         if exists(data["name"], products):
             return {"message": "product name already exists"}, 400
         data["id"] = generate_id(products)
         self.db.insert_product(
             data["id"], data["name"], data["description"],
-            data["quantity"], data["price"]
+            data["category"], data["quantity"], data["price"]
             )
         return {"message": "Product added successfully",
                 "product": data}, 201
@@ -102,6 +103,7 @@ class SpecificProduct(Resource, FetchDatabase):
             if product.get_id() == product_id:
                 data["name"] = product.get_name()
                 data["id"] = product.get_id()
+                data["category"] = product.get_category()
                 data["quantity"] = product.get_quantity()
                 data["price"] = product.get_price()
                 return {"product_id": data}, 200
@@ -122,9 +124,9 @@ class SpecificProduct(Resource, FetchDatabase):
             return {"message": "Please input something"}, 401
         if not validate_put_product(data)[0]:
             return {"message": validate_put_product(data)[1]}, 400
-        data = assign_put(product_id)
+        data = assign_put(product_id, data)
         self.db.update_product(
-            product_id, data["name"], data["description"],
+            product_id, data["name"], data["description"], data["category"],
             data["quantity"], data["price"])
         return {"message": "product updated successfully",
                 "product": data}, 201

@@ -82,9 +82,10 @@ class Admin(StoreAttendant):
         
 class Product():
     """creates a product object"""
-    def __init__(self, id, name, description, quantity, price):
+    def __init__(self, id, name, description, category, quantity, price):
         self.id = id
         self.name = name
+        self.category = category
         self.description = description
         self.quantity = quantity
         self.price = price
@@ -97,6 +98,9 @@ class Product():
 
     def get_quantity(self):
         return self.quantity
+
+    def get_category(self):
+        return self.category
     
     def get_description(self):
         return self.description
@@ -109,6 +113,7 @@ class Product():
             "id": self.id,
             "name": self.name,
             "description": self.description,
+            "category": self.category,
             "price": self.price,
             "quantity": self.quantity
             }
@@ -183,7 +188,7 @@ class FetchData():
         pd = self.db.fetch_products()
         products.clear()
         for product in pd:
-            product["name"] = Product(product["id"], product["name"], product["description"], product["quantity"], product["price"])
+            product["name"] = Product(product["id"], product["name"], product["description"], product["category"], product["quantity"], product["price"])
             products.append(product["name"])
 
     def create_sales(self):

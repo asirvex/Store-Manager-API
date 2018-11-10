@@ -22,7 +22,8 @@ def exists(item_name, list_name):
 
 
 def validate_put_product(dict):
-    if "name" not in dict and "description" not in dict and "quantity" not in dict and "price" not in dict:
+    if "name" not in dict and "description" not in dict and \
+    "category" not in "quantity" not in dict and "price" not in dict:
         return False, "Input should contain atleast a name, description, quantity or price field"
 
     for value in dict.values():
@@ -40,6 +41,9 @@ def validate_put_product(dict):
     if "description" in dict:
         if type(dict["description"]) is not str:
             return False, "description input should be a string"
+    if "category" in dict:
+        if type(dict["category"]) is not str:
+            return False, "category input should be a string"
     if "quantity" in dict:
         if type(dict["quantity"]) is not int:
             return False, "quantity input should be a string"
@@ -54,6 +58,8 @@ def validate_product_input(dictionary):
         return False, "Data input should contain a name field"
     if "description" not in dictionary:
         return False, "Data input should contain a description"
+    if "category" not in dictionary:
+        return False, "Data input should contain a category"
     if "quantity" not in dictionary:
         return False, "Data input should contain a quantity field"
     if "price" not in dictionary:
@@ -73,6 +79,9 @@ def validate_product_input(dictionary):
 
     if type(dictionary["description"]) is not str:
         return False, "description input should be a string"
+
+    if type(dictionary["category"]) is not str:
+        return False, "category input should be a string"
 
     if type(dictionary["quantity"]) is not int:
         return False, "quantity input should be a string"
@@ -116,14 +125,15 @@ def validate_sales_input(products_list):
     return True, "Success"
 
 
-def assign_put(product_id):
-    data = {}
+def assign_put(product_id, data):
     for product in products:
         if product.get_id() == product_id:
             if "name" not in data:
                 data["name"] = product.get_name()
             if "description" not in data:
                 data["description"] = product.get_description()
+            if "category" not in data:
+                data["category"] = product.get_category()
             if "quantity" not in data:
                 data["quantity"] = product.get_quantity()
             if "price" not in data:
