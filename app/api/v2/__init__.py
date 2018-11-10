@@ -1,7 +1,7 @@
 from flask_restful import Api
 from flask import Blueprint
 from .views import (Products, SpecificProduct, Sales, Login,
-                    SignUp, SpecificSale, Promote)
+                    SignUp, SpecificSale, Promote, Logout)
 
 
 v2 = Blueprint("version_two", __name__)
@@ -13,3 +13,4 @@ api.add_resource(Login, "/auth/login")
 api.add_resource(SignUp, "/auth/signup")
 api.add_resource(SpecificSale, "/sales/<sale_id>")
 api.add_resource(Promote, "/users/promote")
+api.add_resource(Logout, "/auth/logout")

@@ -5,7 +5,7 @@ import os
 class Db():
     """creates a connection and a cursor to manipulate the database"""
     def __init__(self):
-        try:
+        try: 
             if os.getenv("APP_SETTINGS") == "development":
                 self.db_url = os.getenv("DATABASE_URL")
             if os.getenv("APP_SETTINGS") == "testing":
@@ -53,6 +53,13 @@ class Db():
                 quantity INT NOT NULL
             );"""
             self.cursor.execute(self.product_sales)
+
+            self.btokens = """CREATE TABLE IF NOT EXISTS btokens(
+                id SERIAL PRIMARY KEY,
+                token TEXT NOT NULL UNIQUE,
+                owner TEXT NOT NULL
+            );"""
+            self.cursor.execute(self.btokens)
             self.connection.commit()
 
         except psycopg2.Error as db_error:
@@ -130,6 +137,18 @@ class Db():
                 self.description, self.quantity, self.price)
         )
         self.connection.commit()
+
+    def insert_token(self, token, user):
+        """inserts a token to be blacklisted"""
+        self.cursor.execute("""INSERT INTO btokens(token, owner) VALUES(%s, %s)""", (token, user))
+        self.connection.commit()
+        
+    def fetch_token(self, token):
+        """fetchs a blacklisted token"""
+        bt = None
+        self.cursor.execute("""SELECT * FROM btokens where token = %s""", (token,))
+        bt = self.cursor.fetchall()
+        return bt
 
     def fetch_users(self):
         """fetchs the users from the database"""

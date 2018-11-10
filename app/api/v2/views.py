@@ -25,6 +25,10 @@ def token_auth(func):
             token = request.headers["access_token"]
         if not token:
             return {"message": "token required"}, 401
+        db = Db()
+        if db.fetch_token(token):
+                return {"Message":
+                        "You logged out. Please login again to continue"}, 401 
         current_user = None
         try:
             token_data = jwt.decode(
@@ -289,3 +293,10 @@ class Promote(Resource, FetchDatabase):
                         "user": theuser}, 201
         return {"message": "You cannot promote a user who isnt registered"
                 }, 400
+
+class Logout(Resource, FetchDatabase):
+    @token_auth
+    def post(current_user, self):
+        token = request.headers["access_token"]
+        self.db.insert_token(token, current_user.get_username())
+        return {"Message": "Successfully logged out"}, 200
