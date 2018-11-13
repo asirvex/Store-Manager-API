@@ -11,7 +11,8 @@ class Db():
             if os.getenv("APP_SETTINGS") == "testing":
                 self.db_url = os.getenv("DATABASE_TESTING_URL")
         except Exception:
-            self.conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode = 'require')
+            self.conn = psycopg2.connect(os.environ['DATABASE_URL'],
+                                         sslmode='require')
 
         self.connection = psycopg2.connect(self.db_url)
         self.cursor = self.connection.cursor()
@@ -136,7 +137,7 @@ class Db():
             """INSERT INTO products(id, name, description, category, quantity, price)
             VALUES(%s, %s, %s, %s, %s, %s)""",
             (self.product_id, self.name, self.description,
-            self.category, self.quantity, self.price)
+             self.category, self.quantity, self.price)
         )
         self.connection.commit()
 

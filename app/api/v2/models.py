@@ -25,7 +25,7 @@ class StoreAttendant():
     def get_second_name(self):
         return self.second_name
 
-    def get_employee_id(self):
+    def get_id(self):
         return self.employee_id
     
     def get_password(self):
@@ -61,7 +61,7 @@ class Admin(StoreAttendant):
         if username in store_attendants:
             return "username already taken"
         for employee in store_attendants:
-            if employee.get_employee_id() == employee_id:
+            if employee.get_id() == employee_id:
                 return "employee id already taken"
         db = Db()
         db.insert_user(employee_id, username, first_name, second_name, password, admin=False)
@@ -73,7 +73,7 @@ class Admin(StoreAttendant):
         db.insert_product(id, name, description, Quantity, price)
 
     def view_sales(self):
-        my_sales=[]
+        my_sales = []
         for sale in sales:
                 my_sales.append(sale.get_dict())
         
@@ -138,10 +138,10 @@ class Sale():
         return self.owner
 
     def get_products_sold(self):
-        return self.products_sold  
+        return self.products_sold
     
     def get_total_price(self):
-        return self.total_price 
+        return self.total_price
 
     def get_dict(self):
         attributes_dict = {
@@ -195,8 +195,8 @@ class FetchData():
         """creates sale objects from the database table sales"""
         salesdata = self.db.fetch_sales()
         for sale in salesdata:
-            sale["id"] = Sale(sale["id"], sale["date"], sale["owner"], sale["products"], sale["total_price"])
-            sales.append(sale["id"])
+            sale["sale_id"] = Sale(sale["sale_id"], sale["date"], sale["owner"], sale["products"], sale["total_price"])
+            sales.append(sale["sale_id"])
 
 try:
     db = Db()

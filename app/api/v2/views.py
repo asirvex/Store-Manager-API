@@ -11,7 +11,7 @@ from .models import store_attendants, products, Product, Admin, StoreAttendant
 from .models import sales, Sale, FetchData
 from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
-                    total_price, verify_sign_up, generate_userid, verify_login,
+                    total_price, verify_sign_up, verify_login,
                     password_validate, generate_id, validate_put_product, 
                     assign_put)
 from .database import Db
@@ -56,6 +56,7 @@ class FetchDatabase():
         fetch_data = FetchData()
         fetch_data.create_store_attendants()
         fetch_data.create_products()
+        fetch_data.create_sales()
 
 
 class Products(Resource, FetchDatabase):
@@ -205,6 +206,7 @@ class Sales(Resource, FetchDatabase):
                 if item["name"] == product["name"]:
                     quantity = product["quantity"] - item["quantity"]
                     self.db.update_quantity(product["name"], quantity)
+        print(sales)
         self.db.insert_sale(
             ddata["sale_id"], ddata["date"], current_user.get_username(),
             ddata["products_sold"], ddata["total_price"])
@@ -269,7 +271,7 @@ class SignUp(Resource, FetchDatabase):
         if not password_validate(data["password"])[0]:
             return {"message": password_validate(data["password"])[1]}, 400
         password = generate_password_hash(data["password"])
-        user_id = generate_userid(store_attendants)
+        user_id = generate_id(store_attendants)
         admin.add_store_attendant(
             user_id, username, first_name, second_name, password
             )

@@ -5,7 +5,7 @@ import datetime
 import os
 from functools import wraps
 
-from .models import products, Product, StoreAttendant, store_attendants
+from .models import products, Product, StoreAttendant, store_attendants, sales
 
 
 def password_validate(password):
@@ -144,15 +144,15 @@ def assign_put(product_id, data):
                 data["price"] = product.get_price()
     return data
 
+
 def product_exists(products_list):
-    i=0
+    i = 0
     for item in products_list:
         for product in products:
             if item["name"] == product.get_name():
                 i += 1
     if i == len(products_list):
         return True, "success"
-    product
     message = products_list[i]
     return False, message
 
@@ -184,21 +184,10 @@ def subtract_quantity(products_list):
                 product.quantity = product.get_quantity() - item["quantity"]
 
 
-def generate_userid(store_attendants):
-    user_id = random.randint(1, 1000)
-    if store_attendants:
-        for a_user in store_attendants:
-            if a_user.get_employee_id()==user_id:
-                return generate_userid(store_attendants)
-    return user_id
-
-
 def generate_id(ls):
-    sale_id = random.randint(1, 10000)
+    sale_id = 1
     if ls:
-        for item in ls:
-            if item.get_id() == sale_id:
-                return generate_id(ls)
+        sale_id = ls[-1].get_id() + 1
     return sale_id
 
 

@@ -64,7 +64,8 @@ class BaseTest(unittest.TestCase):
                 "name": "milk 500ml",
                 "description": "sweet fresh milk",
                 "price": 50,
-                "quantity": 100
+                "quantity": 100,
+                "category": "food"
             })
 
         self.product2 = json.dumps(
@@ -72,7 +73,8 @@ class BaseTest(unittest.TestCase):
                 "name": "jacket",
                 "description": "brown leather jacket",
                 "price": 1200,
-                "quantity": 70
+                "quantity": 70,
+                "category": "clothes"
             })
         self.sale = json.dumps([
             {
@@ -95,7 +97,8 @@ class BaseTest(unittest.TestCase):
                                     "name": "milk 500ml",
                                     "description": "sweet fresh milk",
                                     "price": 50,
-                                    "quantity": 100
+                                    "quantity": 100,
+                                    "category": "food"
                                    }
                               ),
                               headers={
