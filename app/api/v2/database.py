@@ -67,20 +67,21 @@ class Db():
         except psycopg2.Error as db_error:
             print(db_error)
     
-    def insert_sale(self, sale_id, date, owner, products, total_price):
+    def insert_sale(self, data, owner):
         self.cursor.execute(
             """INSERT INTO sales(id, date, owner, totalprice)
-            VALUES(%s, %s, %s, %s)""", (sale_id, date, owner, total_price)
+            VALUES(%s, %s, %s, %s)""",
+            (data["sale_id"], data["date"], owner, data["total_price"])
         )
         self.connection.commit()
-        for product in products:
+        for product in data["products_sold"]:
             product_name = product["name"]
             quantity = product["quantity"]
             price = product["price"]
             self.cursor.execute(
                 """INSERT INTO product_sales(sale_id, product_name, price, quantity)
                 VALUES(%s, %s, %s, %s)""",
-                (sale_id, product_name, price, quantity)
+                (data["sale_id"], product_name, price, quantity)
             )
             self.connection.commit()
 
@@ -92,28 +93,24 @@ class Db():
         )
         self.connection.commit()
 
-    def update_product(self, id, name, description, category, quantity, price):
+    def update_product(self, id, data):
         """Updates a product in the database"""
         self.cursor.execute(
             """UPDATE products SET name = %s , description = %s ,
             category = %s , quantity = %s , price = %s WHERE id = %s """,
-            (name, description, category, quantity, price, id)
+            (data["name"], data["description"], data["category"],
+             data["quantity"], data["price"], id)
         )
         self.connection.commit()
 
-    def insert_user(self, id, username, firstname, secondname, password, admin):
+    def insert_user(self, data):
         """inserts a user into the users table"""
-        self.username = username
-        self.firstname = firstname
-        self.secondname = secondname
-        self.password = password
-        self.admin = admin
         self.cursor.execute(
             """INSERT INTO users(employeeId, username,
             firstname, secondname, password, admin)
             VALUES(%s, %s, %s, %s, %s, %s)""",
-            (id, self.username, self.firstname, self.secondname,
-                self.password, self.admin)
+            (data["user_id"], data["username"], data["first_name"], 
+             data["second_name"], data["password"], data["admin"])
         )
         self.connection.commit()
 
@@ -125,14 +122,14 @@ class Db():
         )
         self.connection.commit()
 
-    def insert_product(self, product_id, name, description, category, quantity, price):
+    def insert_product(self, data):
         """inserts a product into the database"""
-        self.product_id = product_id
-        self.name = name
-        self.description = description
-        self.category = category
-        self.quantity = quantity
-        self.price = price
+        self.product_id = data["id"]
+        self.name = data["name"]
+        self.description = data["description"]
+        self.category = data["category"]
+        self.quantity = data["quantity"]
+        self.price = data["price"]
         self.cursor.execute(
             """INSERT INTO products(id, name, description, category, quantity, price)
             VALUES(%s, %s, %s, %s, %s, %s)""",

@@ -81,10 +81,7 @@ class Products(Resource, FetchDatabase):
         if exists(data["name"], products):
             return {"message": "product name already exists"}, 400
         data["id"] = generate_id(products)
-        self.db.insert_product(
-            data["id"], data["name"], data["description"],
-            data["category"], data["quantity"], data["price"]
-            )
+        self.db.insert_product(data)
         return {"message": "Product added successfully",
                 "product": data}, 201
 
@@ -127,8 +124,7 @@ class SpecificProduct(Resource, FetchDatabase):
             return {"message": validate_put_product(data)[1]}, 400
         data = assign_put(product_id, data)
         self.db.update_product(
-            product_id, data["name"], data["description"], data["category"],
-            data["quantity"], data["price"])
+            product_id, data)
         return {"message": "product updated successfully",
                 "product": data}, 201
 
@@ -207,9 +203,7 @@ class Sales(Resource, FetchDatabase):
                     quantity = product["quantity"] - item["quantity"]
                     self.db.update_quantity(product["name"], quantity)
         print(sales)
-        self.db.insert_sale(
-            ddata["sale_id"], ddata["date"], current_user.get_username(),
-            ddata["products_sold"], ddata["total_price"])
+        self.db.insert_sale(ddata, current_user.get_username())
         return {"message":
                 "sale added successfully", "sale": ddata}, 201
 
@@ -262,19 +256,20 @@ class SignUp(Resource, FetchDatabase):
         data = request.get_json()
         if not verify_sign_up(data)[0]:
             return {"message": verify_sign_up(data)[1]}, 400
-        first_name = data["first_name"].strip().lower()
-        second_name = data["second_name"].strip().lower()
-        username = data["username"].strip().lower()
+        data["first_name"] = data["first_name"].strip().lower()
+        data["second_name"] = data["second_name"].strip().lower()
+        data["username"] = data["username"].strip().lower()
         for user in store_attendants:
-            if user.get_username() == username:
-                {"message": "username already taken"}, 400
+            print(user.get_username())
+            if user.get_username() == data["username"]:
+                return {"message": "username already taken"}, 400
         if not password_validate(data["password"])[0]:
             return {"message": password_validate(data["password"])[1]}, 400
         password = generate_password_hash(data["password"])
-        user_id = generate_id(store_attendants)
-        admin.add_store_attendant(
-            user_id, username, first_name, second_name, password
-            )
+        data["password"] = password
+        data["user_id"] = generate_id(store_attendants)
+        data["admin"] = False
+        self.db.insert_user(data)
         return {"message": "user added successfully"}, 201
 
 

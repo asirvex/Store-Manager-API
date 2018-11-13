@@ -55,17 +55,6 @@ class Admin(StoreAttendant):
     def __init__(self, employee_id, username, first_name, second_name, password):
         super().__init__(employee_id, username, first_name, second_name, password)
         self.admin = True
-
-    def add_store_attendant(self, employee_id, username, first_name, second_name, password):
-        """Creates a store_attedant object and adds it to the store attendants list"""
-        if username in store_attendants:
-            return "username already taken"
-        for employee in store_attendants:
-            if employee.get_id() == employee_id:
-                return "employee id already taken"
-        db = Db()
-        db.insert_user(employee_id, username, first_name, second_name, password, admin=False)
-        return "store attendant created successfully"
     
     def add_product(self, id, name, description, Quantity, price):
         """creates a product object and appends it to the products dictionary"""
