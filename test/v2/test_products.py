@@ -10,7 +10,8 @@ class TestProducts(BaseTest):
                     "id": 41,
                     "name": "pr",
                     "price": 845,
-                    "description": "the product is great"
+                    "description": "the product is great",
+                    "category": "food"
                 }),
             headers={
                     'content-type': 'application/json'
@@ -44,7 +45,8 @@ class TestProducts(BaseTest):
                 "name": "unique product",
                 "description": "the product is really unique",
                 "quantity": 42,
-                "price": 100
+                "price": 100,
+                "category": "food"
             }),
             headers={
                 'access_token': self.user_token,
@@ -60,14 +62,14 @@ class TestProducts(BaseTest):
                 "name": "milk 500ml",
                 "description": "the product is really unique",
                 "quantity": 42,
-                "price": 100
+                "price": 100,
+                "description": "food"
             }),
             headers={
                 'access_token': self.access_token,
                 'content-type': 'application/json'
                     })
         self.assertEqual(resp.status_code, 400)
-
 
     def test_for_successful_product_add(self):
         resp = self.test_client.post(
@@ -77,7 +79,8 @@ class TestProducts(BaseTest):
                 "name": "unique product",
                 "description": "the product is really unique",
                 "quantity": 42,
-                "price": 100
+                "price": 100,
+                "category": "food"
             }),
             headers={
                 'access_token': self.access_token,

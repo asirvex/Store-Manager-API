@@ -11,7 +11,8 @@ class Db():
             if os.getenv("APP_SETTINGS") == "testing":
                 self.db_url = os.getenv("DATABASE_TESTING_URL")
         except Exception:
-            self.conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode = 'require')
+            self.conn = psycopg2.connect(os.environ['DATABASE_URL'],
+                                         sslmode='require')
 
         self.connection = psycopg2.connect(self.db_url)
         self.cursor = self.connection.cursor()
@@ -23,6 +24,7 @@ class Db():
                 id INT PRIMARY KEY NOT NULL,
                 name TEXT NOT NULL UNIQUE,
                 description TEXT NOT NULL,
+                category TEXT,
                 quantity INT NOT NULL,
                 price REAL NOT NULL
             );"""
@@ -53,6 +55,13 @@ class Db():
                 quantity INT NOT NULL
             );"""
             self.cursor.execute(self.product_sales)
+
+            self.btokens = """CREATE TABLE IF NOT EXISTS btokens(
+                id SERIAL PRIMARY KEY,
+                token TEXT NOT NULL UNIQUE,
+                owner TEXT NOT NULL
+            );"""
+            self.cursor.execute(self.btokens)
             self.connection.commit()
 
         except psycopg2.Error as db_error:
@@ -83,12 +92,12 @@ class Db():
         )
         self.connection.commit()
 
-    def update_product(self, id, name, description, quantity, price):
+    def update_product(self, id, name, description, category, quantity, price):
         """Updates a product in the database"""
         self.cursor.execute(
             """UPDATE products SET name = %s , description = %s ,
-            quantity = %s , price = %s WHERE id = %s """,
-            (name, description, quantity, price, id)
+            category = %s , quantity = %s , price = %s WHERE id = %s """,
+            (name, description, category, quantity, price, id)
         )
         self.connection.commit()
 
@@ -116,20 +125,33 @@ class Db():
         )
         self.connection.commit()
 
-    def insert_product(self, product_id, name, description, quantity, price):
+    def insert_product(self, product_id, name, description, category, quantity, price):
         """inserts a product into the database"""
         self.product_id = product_id
         self.name = name
         self.description = description
+        self.category = category
         self.quantity = quantity
         self.price = price
         self.cursor.execute(
-            """INSERT INTO products(id, name, description, quantity, price)
-            VALUES(%s, %s, %s, %s, %s)""",
-            (self.product_id, self.name,
-                self.description, self.quantity, self.price)
+            """INSERT INTO products(id, name, description, category, quantity, price)
+            VALUES(%s, %s, %s, %s, %s, %s)""",
+            (self.product_id, self.name, self.description,
+             self.category, self.quantity, self.price)
         )
         self.connection.commit()
+
+    def insert_token(self, token, user):
+        """inserts a token to be blacklisted"""
+        self.cursor.execute("""INSERT INTO btokens(token, owner) VALUES(%s, %s)""", (token, user))
+        self.connection.commit()
+        
+    def fetch_token(self, token):
+        """fetchs a blacklisted token"""
+        bt = None
+        self.cursor.execute("""SELECT * FROM btokens where token = %s""", (token,))
+        bt = self.cursor.fetchall()
+        return bt
 
     def fetch_users(self):
         """fetchs the users from the database"""
@@ -157,8 +179,9 @@ class Db():
             product["id"] = row[0]
             product["name"] = row[1]
             product["description"] = row[2]
-            product["quantity"] = row[3]
-            product["price"] = row[4]
+            product["category"] = row[3]
+            product["quantity"] = row[4]
+            product["price"] = row[5]
             products.append(product)
         return products
 

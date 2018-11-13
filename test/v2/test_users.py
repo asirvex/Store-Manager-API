@@ -92,7 +92,7 @@ class TestUsers(BaseTest):
                                     'content-type': 'application/json'
                                 })
         response = json.loads(resp.data)
-        self.assertEqual(response["message"], "Atleast one field contains an empty input")
+        self.assertEqual(response["message"], "Empty input")
         self.assertEqual(resp.status_code, 400)
 
     def test_login_with_wrong_password(self):

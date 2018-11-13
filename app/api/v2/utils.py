@@ -5,7 +5,7 @@ import datetime
 import os
 from functools import wraps
 
-from .models import products, Product, StoreAttendant, store_attendants
+from .models import products, Product, StoreAttendant, store_attendants, sales
 
 
 def password_validate(password):
@@ -22,7 +22,8 @@ def exists(item_name, list_name):
 
 
 def validate_put_product(dict):
-    if "name" not in dict and "description" not in dict and "quantity" not in dict and "price" not in dict:
+    if "name" not in dict and "description" not in dict and \
+    "category" not in "quantity" not in dict and "price" not in dict:
         return False, "Input should contain atleast a name, description, quantity or price field"
 
     for value in dict.values():
@@ -33,6 +34,11 @@ def validate_put_product(dict):
         dict["price"] = float(dict["price"])
     except:
         pass
+    
+    try:
+        dict["quantity"] = int(dict["quantity"])
+    except:
+        pass
 
     if "name" in dict:
         if type(dict["name"]) is not str:
@@ -40,14 +46,15 @@ def validate_put_product(dict):
     if "description" in dict:
         if type(dict["description"]) is not str:
             return False, "description input should be a string"
+    if "category" in dict:
+        if type(dict["category"]) is not str:
+            return False, "category input should be a string"
     if "quantity" in dict:
         if type(dict["quantity"]) is not int:
-            return False, "quantity input should be a string"
+            return False, "quantity input should be an integer"
     if "price" in dict:
         if type(dict["price"]) is not float:
             return False, "price input should be a float or integer"
-    if dict["price"] <= 1:
-        return False, "a products price cannot be zero or less than zero"
     return True, "success"
 
 
@@ -56,6 +63,8 @@ def validate_product_input(dictionary):
         return False, "Data input should contain a name field"
     if "description" not in dictionary:
         return False, "Data input should contain a description"
+    if "category" not in dictionary:
+        return False, "Data input should contain a category"
     if "quantity" not in dictionary:
         return False, "Data input should contain a quantity field"
     if "price" not in dictionary:
@@ -69,15 +78,21 @@ def validate_product_input(dictionary):
         dictionary["price"] = float(dictionary["price"])
     except:
         pass
-
+    try:
+        dictionary["quantity"] = int(dictionary["quantity"])
+    except:
+        pass        
     if type(dictionary["name"]) is not str:
         return False, "name input should be a string" 
 
     if type(dictionary["description"]) is not str:
         return False, "description input should be a string"
 
+    if type(dictionary["category"]) is not str:
+        return False, "category input should be a string"
+
     if type(dictionary["quantity"]) is not int:
-        return False, "quantity input should be a string"
+        return False, "quantity input should be an integer"
 
     if type(dictionary["price"]) is not float:
         return False, "price input should be a float or integer"
@@ -104,12 +119,8 @@ def validate_sales_input(products_list):
             return False, message
     for value in product.values():
         if not value:
-            message = "Atleast one field contains an empty input"
+            message = "Empty input"
             return False, message
-    try:
-        product["price"] = float(product["price"])
-    except:
-        pass
     if type(product["name"]) is not str or type(product["quantity"]) \
             is not int:
         message = "incorrect data types, data types should be: \
@@ -118,15 +129,30 @@ def validate_sales_input(products_list):
     return True, "Success"
 
 
+def assign_put(product_id, data):
+    for product in products:
+        if product.get_id() == product_id:
+            if "name" not in data:
+                data["name"] = product.get_name()
+            if "description" not in data:
+                data["description"] = product.get_description()
+            if "category" not in data:
+                data["category"] = product.get_category()
+            if "quantity" not in data:
+                data["quantity"] = product.get_quantity()
+            if "price" not in data:
+                data["price"] = product.get_price()
+    return data
+
+
 def product_exists(products_list):
-    i=0
+    i = 0
     for item in products_list:
         for product in products:
             if item["name"] == product.get_name():
                 i += 1
     if i == len(products_list):
         return True, "success"
-    product
     message = products_list[i]
     return False, message
 
@@ -158,21 +184,10 @@ def subtract_quantity(products_list):
                 product.quantity = product.get_quantity() - item["quantity"]
 
 
-def generate_userid(store_attendants):
-    user_id = random.randint(1, 1000)
-    if store_attendants:
-        for a_user in store_attendants:
-            if a_user.get_employee_id()==user_id:
-                return generate_userid(store_attendants)
-    return user_id
-
-
 def generate_id(ls):
-    sale_id = random.randint(1, 10000)
+    sale_id = 1
     if ls:
-        for item in ls:
-            if item.get_id() == sale_id:
-                return generate_id(ls)
+        sale_id = ls[-1].get_id() + 1
     return sale_id
 
 
@@ -207,6 +222,6 @@ def verify_login(data):
         return False, message
     for value in data.values():
         if not value:
-            message = "Atleast one field contains an empty input"
+            message = "Empty input"
             return False, message
     return True, "success"
