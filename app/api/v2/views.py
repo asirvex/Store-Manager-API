@@ -173,6 +173,11 @@ class Sales(Resource, FetchDatabase):
     def post(current_user, self):
         data = request.get_json()
         ddata = {}
+        for product in data:
+            try:
+                product["quantity"] = int(product["quantity"])
+            except:
+                pass
         if current_user.get_admin_status():
             return {"message": "only a store attendant can post a sale"}, 401
         if not validate_sales_input(data)[0]:

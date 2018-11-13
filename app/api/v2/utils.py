@@ -34,6 +34,11 @@ def validate_put_product(dict):
         dict["price"] = float(dict["price"])
     except:
         pass
+    
+    try:
+        dict["quantity"] = int(dict["quantity"])
+    except:
+        pass
 
     if "name" in dict:
         if type(dict["name"]) is not str:
@@ -46,7 +51,7 @@ def validate_put_product(dict):
             return False, "category input should be a string"
     if "quantity" in dict:
         if type(dict["quantity"]) is not int:
-            return False, "quantity input should be a string"
+            return False, "quantity input should be an integer"
     if "price" in dict:
         if type(dict["price"]) is not float:
             return False, "price input should be a float or integer"
@@ -73,7 +78,10 @@ def validate_product_input(dictionary):
         dictionary["price"] = float(dictionary["price"])
     except:
         pass
-
+    try:
+        dictionary["quantity"] = int(dictionary["quantity"])
+    except:
+        pass        
     if type(dictionary["name"]) is not str:
         return False, "name input should be a string" 
 
@@ -84,7 +92,7 @@ def validate_product_input(dictionary):
         return False, "category input should be a string"
 
     if type(dictionary["quantity"]) is not int:
-        return False, "quantity input should be a string"
+        return False, "quantity input should be an integer"
 
     if type(dictionary["price"]) is not float:
         return False, "price input should be a float or integer"
@@ -113,10 +121,6 @@ def validate_sales_input(products_list):
         if not value:
             message = "Empty input"
             return False, message
-    try:
-        product["price"] = float(product["price"])
-    except:
-        pass
     if type(product["name"]) is not str or type(product["quantity"]) \
             is not int:
         message = "incorrect data types, data types should be: \
