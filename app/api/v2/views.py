@@ -12,7 +12,7 @@ from .models import sales, Sale, FetchData
 from .utils import validate_product_input, exists, validate_sales_input
 from .utils import (product_exists, right_quantity, subtract_quantity,
                     total_price, verify_sign_up, verify_login,
-                    password_validate, generate_id, validate_put_product, 
+                    password_validate, generate_id, validate_put_product,
                     assign_put)
 from .database import Db
 
