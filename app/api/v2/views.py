@@ -118,12 +118,12 @@ class SpecificProduct(Resource, FetchDatabase):
             product_id = int(product_id)
         except:
             return {"message":
-                    "The product id in the url must be an integer"}, 401
+                    "The product id in the url must be an integer"}, 400
         if not current_user.get_admin_status():
             return {"message": "only the admin can edit a product"}, 401
         data = request.get_json()
         if not data:
-            return {"message": "Please input something"}, 401
+            return {"message": "Please input something"}, 400
         if not validate_put_product(data)[0]:
             return {"message": validate_put_product(data)[1]}, 400
         data = assign_put(product_id, data)
@@ -301,6 +301,7 @@ class Promote(Resource, FetchDatabase):
                         "user": theuser}, 201
         return {"message": "You cannot promote a user who isnt registered"
                 }, 400
+
 
 class Logout(Resource, FetchDatabase):
     @token_auth

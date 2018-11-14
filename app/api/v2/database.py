@@ -50,7 +50,7 @@ class Db():
 
             self.product_sales = """CREATE TABLE IF NOT EXISTS product_sales(
                 sale_id INT REFERENCES sales (id) ON UPDATE CASCADE ON DELETE CASCADE,
-                product_name TEXT REFERENCES products (name) ON UPDATE CASCADE,
+                product_name TEXT,
                 price TEXT NOT NULL,
                 quantity INT NOT NULL
             );"""
