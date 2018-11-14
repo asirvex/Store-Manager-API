@@ -18,6 +18,7 @@ class BaseTest(unittest.TestCase):
                         "second_name": admin.get_second_name(),
                         "password": "pwdhrdnd"
                         })
+
         self.admin_login_details = json.dumps({
             "username": "super_admin",
             "password": "pwdhrdnd"
@@ -28,6 +29,7 @@ class BaseTest(unittest.TestCase):
                                             headers={
                                              'content-type': 'application/json'
                                             })
+
         self.access_token = json.loads(admin_login.data.decode())["token"]
 
         self.attendant = json.dumps({
@@ -36,11 +38,25 @@ class BaseTest(unittest.TestCase):
                         "second_name": "lin",
                         "password": "wqttoss"
                         })
+
+        self.attendant2 = json.dumps({
+                        "username": "tripel",
+                        "first_name": "Lucky",
+                        "second_name": "lil",
+                        "password": "password"
+                        })
+
+        self.attendant2_login_details = json.dumps({
+            "username": "tripel",
+            "password": "password"
+        })
+
         self.attendant_login_details = json.dumps(
             {
                 "username": "sharon",
                 "password": "wqttoss"
             })
+
         self.signup_attendant = self.test_client.post(
             "/api/v2/auth/signup",
             data=self.attendant,
@@ -48,6 +64,15 @@ class BaseTest(unittest.TestCase):
                 'content-type': 'application/json',
                 "access_token": self.access_token
             })
+
+        self.signup_attendant2 = self.test_client.post(
+            "/api/v2/auth/signup",
+            data=self.attendant2,
+            headers={
+                'content-type': 'application/json',
+                "access_token": self.access_token
+            })
+
         self.login_attendant = self.test_client.post(
             "/api/v2/auth/login",
             data=self.attendant_login_details,
@@ -55,9 +80,20 @@ class BaseTest(unittest.TestCase):
                 'content-type': 'application/json',
             })
 
+        self.login_attendant2 = self.test_client.post(
+            "/api/v2/auth/login",
+            data=self.attendant2_login_details,
+            headers={
+                'content-type': 'application/json',
+            })
+
         self.user_token = json.loads(
             self.login_attendant.data.decode()
             )["token"]
+        
+        self.user2_token = json.loads(
+            self.login_attendant2.data.decode()
+        )["token"]
         
         self.product1 = json.dumps(
             {
@@ -92,8 +128,7 @@ class BaseTest(unittest.TestCase):
             ]
         )
         self.test_client.post("/api/v2/products",
-                              data=json.dumps(
-                                  {                              
+                              data=json.dumps({                              
                                     "name": "milk 500ml",
                                     "description": "sweet fresh milk",
                                     "price": 50,

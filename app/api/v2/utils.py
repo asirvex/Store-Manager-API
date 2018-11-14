@@ -39,7 +39,7 @@ def validate_put_product(dict):
         dict["quantity"] = int(dict["quantity"])
     except:
         pass
-
+    
     if "name" in dict:
         if type(dict["name"]) is not str:
             return False, "name input should be a string" 
@@ -186,8 +186,11 @@ def subtract_quantity(products_list):
 
 def generate_id(ls):
     sale_id = 1
+    ids = []
     if ls:
-        sale_id = ls[-1].get_id() + 1
+        for item in ls:
+            ids.append(item.get_id())
+        sale_id = max(ids) + 1      
     return sale_id
 
 
