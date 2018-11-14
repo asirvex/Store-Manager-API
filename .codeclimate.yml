@@ -7,7 +7,7 @@ checks:
   file-lines:
     enabled: True
   method-complexity:
-    enabled: True
+    enabled: false
   method-count:
     enabled: True
   method-lines:
