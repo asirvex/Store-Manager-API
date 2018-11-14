@@ -39,7 +39,7 @@ def validate_put_product(dict):
         dict["quantity"] = int(dict["quantity"])
     except:
         pass
-
+    
     if "name" in dict:
         if type(dict["name"]) is not str:
             return False, "name input should be a string" 

@@ -15,7 +15,7 @@ checks:
   nested-control-flow:
     enabled: True
   return-statements:
-    enabled: True
+    enabled: false
   similar-code:
     enabled: false
   identical-code:
