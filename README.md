@@ -38,11 +38,11 @@ Steps to run the project
 
 Endpoint | Functionality | Requirements
 ------------ | ------------- | -------------
-post /api/v1/auth/signup | register a user | user information
-post /api/v1/auth/login | get sales | password authentification
-get /api/v1/products | view all the products | access_token
-post /api/v1/products | creates a new product entry | product info, access_token
-get /api/v1/products/<int> | get one product | access_token
-get /api/v1/sales | get sales | access_token
-get /api/v1/sales/<int>| get one sale | access_token
-post /api/v1/sales | create a new sale entry | sale info, access_token
+post /api/v2/auth/signup | register a user | user information
+post /api/v2/auth/login | get sales | password authentification
+get /api/v2/products | view all the products | access_token
+post /api/v2/products | creates a new product entry | product info, access_token
+get /api/v2/products/<int> | get one product | access_token
+get /api/v2/sales | get sales | access_token
+get /api/v2/sales/<int>| get one sale | access_token
+post /api/v2/sales | create a new sale entry | sale info, access_token
