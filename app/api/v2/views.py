@@ -43,8 +43,12 @@ def token_auth(func):
         return func(current_user, *args, **kwags)
     return decorated
 
-admin = Admin(
-    1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"))
+admin = Admin({
+    "id": 1,
+    "username": "super_admin",
+    "first_name": "main",
+    "second_name": "admin",
+    "password": generate_password_hash("pwdhrdnd")})
 
 
 class FetchDatabase():

@@ -8,12 +8,19 @@ sales = []
 
 class StoreAttendant():
     """creates a store attendant object"""
-    def __init__(self, employee_id, username, first_name, second_name, password):
-        self.employee_id = employee_id
-        self.username = username
-        self.first_name = first_name
-        self.second_name = second_name
-        self.password = password
+    def __init__(self, dict):
+        if "username" in dict and "first_name" in dict and "second_name" \
+                in dict and "password" in dict and "id" in dict:
+            self.username = dict["username"]
+            self.password = dict["password"]
+            self.first_name = dict["first_name"]
+            self.second_name = dict["second_name"]
+            self.id = dict["id"]
+        else:
+            return TypeError(
+                """must provide 'username', 'password',
+                'id', 'first_name', 'second_name' parameter values"""
+                )
         self.admin = False
 
     def get_username(self):
@@ -26,7 +33,7 @@ class StoreAttendant():
         return self.second_name
 
     def get_id(self):
-        return self.employee_id
+        return self.id
     
     def get_password(self):
         return self.password
@@ -36,10 +43,6 @@ class StoreAttendant():
 
     def get_name(self):
         return self.username
-
-    def add_sale(self, sale_id, date, owner, products_sold, total_price):
-        db = Db()
-        db.insert_sale(sale_id, date, owner, products_sold, total_price)
 
     def view_sales(self):
         my_sales=[]
@@ -52,14 +55,9 @@ class StoreAttendant():
 
 class Admin(StoreAttendant):
     """creates an admin object"""
-    def __init__(self, employee_id, username, first_name, second_name, password):
-        super().__init__(employee_id, username, first_name, second_name, password)
+    def __init__(self, dict):
+        super().__init__(dict)
         self.admin = True
-    
-    def add_product(self, id, name, description, Quantity, price):
-        """creates a product object and appends it to the products dictionary"""
-        db = Db()
-        db.insert_product(id, name, description, Quantity, price)
 
     def view_sales(self):
         my_sales = []
@@ -147,12 +145,6 @@ def clear_lists():
     products.clear()
     sales.clear()
 
-def exists(item_name, ls):
-    """Check if a particular item already exists in the list"""
-    for item in ls:
-        if item.get_name() == item_name:
-            return True
-
 
 class FetchData():
     """Fetchs data from database and creates respective objects"""
@@ -164,18 +156,26 @@ class FetchData():
         """creates store attendant objects from the database"""
         sd = self.db.fetch_users()
         for user in sd:
-            if not exists(user["username"], store_attendants):
-                if not user["admin"]:
-                    user["username"] = StoreAttendant(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
-                    store_attendants.append(user["username"])
-                else:
-                    user["username"] = Admin(user["employeeid"], user["username"], user["firstname"], user["secondname"], user["password"])
-                    store_attendants.append(user["username"])
+            if not user["admin"]:
+                user["username"] = StoreAttendant({
+                    "id": user["employeeid"],
+                    "username": user["username"],
+                    "first_name": user["firstname"],
+                    "second_name": user["secondname"],
+                    "password": user["password"]})
+                store_attendants.append(user["username"])
+            else:
+                user["username"] = Admin({
+                    "id": user["employeeid"],
+                    "username": user["username"],
+                    "first_name": suser["firstname"],
+                    "second_name": user["secondname"],
+                    "password": user["password"]})
+                store_attendants.append(user["username"])
 
     def create_products(self):
         """creates product objects from the database"""
         pd = self.db.fetch_products()
-        products.clear()
         for product in pd:
             product["name"] = Product(product["id"], product["name"], product["description"], product["category"], product["quantity"], product["price"])
             products.append(product["name"])
@@ -189,6 +189,6 @@ class FetchData():
 
 try:
     db = Db()
-    db.insert_user(152, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"), admin=True)
+    db.insert_user(1, "super_admin", "main", "admin", generate_password_hash("pwdhrdnd"), admin=True)
 except:
     pass
