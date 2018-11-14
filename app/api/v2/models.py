@@ -45,7 +45,7 @@ class StoreAttendant():
         return self.username
 
     def view_sales(self):
-        my_sales=[]
+        my_sales = []
         for sale in sales:
             if sale.get_owner() == self.username:
                 my_sales.append(sale.get_dict())
@@ -69,13 +69,20 @@ class Admin(StoreAttendant):
         
 class Product():
     """creates a product object"""
-    def __init__(self, id, name, description, category, quantity, price):
-        self.id = id
-        self.name = name
-        self.category = category
-        self.description = description
-        self.quantity = quantity
-        self.price = price
+    def __init__(self, dict):
+        if "id" in dict and "name" in dict and "description" in dict and \
+             "category" in dict and "quantity" in dict and "price" in dict:
+            self.id = dict["id"]
+            self.name = dict["name"]
+            self.category = dict["category"]
+            self.description = dict["description"]
+            self.quantity = dict["quantity"]
+            self.price = dict["price"]
+        else:
+            return TypeError(
+                """must provide 'id', 'name', 'price'
+                'description', 'category', 'quantity' parameter values"""
+            )
 
     def get_id(self):
         return self.id
@@ -108,12 +115,19 @@ class Product():
 
 class Sale():
     """creates a sale object"""
-    def __init__(self, sale_id, date, owner, products_sold, total_price):
-        self.sale_id = sale_id
-        self.date = date
-        self.owner = owner
-        self.products_sold = products_sold
-        self.total_price = total_price
+    def __init__(self, sale):
+        if "sale_id" in sale and "date" in sale and\
+             "owner" in sale and "products" in sale and "total_price" in sale:
+            self.sale_id = sale["sale_id"]
+            self.date = sale["date"]
+            self.owner = sale["owner"]
+            self.products_sold = sale["products"]
+            self.total_price = sale["total_price"]
+        else:
+            return TypeError(
+                """must provide 'sale_id', 'date', 'owner'
+                'products', 'total_price' parameter values"""
+            )
 
     def get_id(self):
         return self.sale_id
@@ -156,35 +170,32 @@ class FetchData():
         """creates store attendant objects from the database"""
         sd = self.db.fetch_users()
         for user in sd:
+            data = {
+                "id": user["employeeid"],
+                "username": user["username"],
+                "first_name": user["firstname"],
+                "second_name": user["secondname"],
+                "password": user["password"]
+                }
             if not user["admin"]:
-                user["username"] = StoreAttendant({
-                    "id": user["employeeid"],
-                    "username": user["username"],
-                    "first_name": user["firstname"],
-                    "second_name": user["secondname"],
-                    "password": user["password"]})
+                user["username"] = StoreAttendant(data)
                 store_attendants.append(user["username"])
             else:
-                user["username"] = Admin({
-                    "id": user["employeeid"],
-                    "username": user["username"],
-                    "first_name": suser["firstname"],
-                    "second_name": user["secondname"],
-                    "password": user["password"]})
+                user["username"] = Admin(data)
                 store_attendants.append(user["username"])
 
     def create_products(self):
         """creates product objects from the database"""
         pd = self.db.fetch_products()
         for product in pd:
-            product["name"] = Product(product["id"], product["name"], product["description"], product["category"], product["quantity"], product["price"])
+            product["name"] = Product(product)
             products.append(product["name"])
 
     def create_sales(self):
         """creates sale objects from the database table sales"""
         salesdata = self.db.fetch_sales()
         for sale in salesdata:
-            sale["sale_id"] = Sale(sale["sale_id"], sale["date"], sale["owner"], sale["products"], sale["total_price"])
+            sale["sale_id"] = Sale(sale)
             sales.append(sale["sale_id"])
 
 try:
