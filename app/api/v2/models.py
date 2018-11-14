@@ -9,8 +9,8 @@ sales = []
 class StoreAttendant():
     """creates a store attendant object"""
     def __init__(self, dict):
-        if "username" in dict and "first_name" in dict and "second_name" \
-                in dict and "password" in dict and "id" in dict:
+        if "username" and "first_name" and "second_name" and \
+                "password" and "id" in dict:
             self.username = dict["username"]
             self.password = dict["password"]
             self.first_name = dict["first_name"]
@@ -70,8 +70,8 @@ class Admin(StoreAttendant):
 class Product():
     """creates a product object"""
     def __init__(self, dict):
-        if "id" in dict and "name" in dict and "description" in dict and \
-             "category" in dict and "quantity" in dict and "price" in dict:
+        if "id" and "name" and "description" and \
+             "category" and "quantity" and "price" in dict:
             self.id = dict["id"]
             self.name = dict["name"]
             self.category = dict["category"]
@@ -116,8 +116,8 @@ class Product():
 class Sale():
     """creates a sale object"""
     def __init__(self, sale):
-        if "sale_id" in sale and "date" in sale and\
-             "owner" in sale and "products" in sale and "total_price" in sale:
+        if "sale_id" and "date" and "owner" and "products" and \
+                "total_price" in sale:
             self.sale_id = sale["sale_id"]
             self.date = sale["date"]
             self.owner = sale["owner"]
